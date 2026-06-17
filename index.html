@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Display Masjid Assyakur Jone</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <!-- HEADER -->
+    <header>
+        <div class="logo-container">
+            <img src="logo.png" alt="Logo">
+        </div>
+        <div class="title-container">
+            <div class="main-title">MASJID ASSYAKUR JONE</div>
+            <div class="sub-title">Kompleks Perumahan Pesona Aqila Regency</div>
+            <div class="sub-title">Gg. Makassar RT.016 Desa Jone, Kabupaten Paser, Kalimantan Timur, 76251</div>
+        </div>
+    </header>
+
+    <!-- MAIN LAYOUT -->
+    <main>
+        <!-- KOLOM KIRI (25%) -->
+        <div class="left-column">
+            <!-- Sholat Jumat -->
+            <div class="card">
+                <h2>Sholat Jumat</h2>
+                <table class="info-table">
+                    <tr>
+                        <td class="label">Jumat</td>
+                        <td class="value" id="tanggalJumat">-</td>
+                    </tr>
+                    <tr>
+                        <td class="label">Khatib</td>
+                        <td class="value" id="khatib">-</td>
+                    </tr>
+                    <tr>
+                        <td class="label">Imam</td>
+                        <td class="value" id="imam">-</td>
+                    </tr>
+                    <tr>
+                        <td class="label">Bilal</td>
+                        <td class="value" id="muadzin">-</td>
+                    </tr>
+                </table>
+            </div>
+
+            <!-- Kas Keuangan -->
+            <div class="card">
+                <h2>Kas Keuangan</h2>
+                <table class="info-table">
+                    <tr>
+                        <td class="label">Saldo Awal</td>
+                        <td class="value" id="saldoAwal">-</td>
+                    </tr>
+                    <tr>
+                        <td class="label">Penerimaan</td>
+                        <td class="value" id="pemasukan">-</td>
+                    </tr>
+                    <tr>
+                        <td class="label">Pengeluaran</td>
+                        <td class="value" id="pengeluaran">-</td>
+                    </tr>
+                    <tr class="saldo-row">
+                        <td class="label" style="color: #ffcc00;">SALDO</td>
+                        <td class="value" id="totalSaldo" style="color: #ffcc00;">-</td>
+                    </tr>
+                </table>
+            </div>
+
+            <!-- Rekening Masjid -->
+            <div class="card">
+                <h2>Rekening Masjid</h2>
+                <div class="rek-text">
+                    Bankaltimtara<br>
+                    <span class="rek-number">0022299171</span><br>
+                    an. Masjid ASSYAKUR
+                </div>
+            </div>
+        </div>
+
+        <!-- KOLOM TENGAH (40%) -->
+        <div class="center-column card">
+            <h2>Informasi Umum Update</h2>
+            <div class="info-display-container">
+                <div id="infoUpdateContent" class="info-text show">Memuat informasi...</div>
+            </div>
+        </div>
+
+        <!-- KOLOM KANAN (25%) -->
+        <div class="right-column">
+            <!-- Waktu Sholat Berikutnya -->
+            <div class="card prayer-next-box">
+                <h2 class="adzan-title">SHOLAT</h2>
+                <div class="prayer-time" id="adzanTime">00:00 WITA</div>
+                <div class="countdown-timer" id="countdown">00:00:00</div>
+            </div>
+
+            <!-- Waktu Sekarang & Kalender -->
+            <div class="card time-now-box">
+                <h2>Waktu Sekarang</h2>
+                <div class="clock-digital" id="clock">00:00:00 WITA</div>
+                <div class="date-text" id="dateMasehi">-</div>
+                <div class="date-text id-hijriah" id="dateHijri">-</div>
+            </div>
+        </div>
+    </main>
+
+    <!-- RUNNING TEXT -->
+    <div class="marquee-container">
+        <div class="marquee-content">
+            <span id="runText1"></span>
+            <span id="runText2"></span>
+        </div>
+    </div>
+
+    <script src="data.js"></script>
+    <script src="combined.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const container = document.getElementById('infoUpdateContent');
+            const infoList = (typeof dataMasjid !== 'undefined' && dataMasjid.infoUpdate) ? dataMasjid.infoUpdate : [];
+            let index = 0;
+
+            function updateInfo() {
+                if (infoList.length === 0) return;
+                container.classList.remove('show');
+                
+                setTimeout(() => {
+                    container.innerText = infoList[index];
+                    container.classList.add('show');
+                    index = (index + 1) % infoList.length;
+                }, 1500);
+            }
+
+            if (infoList.length > 0) {
+                container.innerText = infoList[0];
+                index = 1;
+                setInterval(updateInfo, 34000);
+            }
+
+            const hariList = ["Minggu", "Senin", "Selasa", "Rabu", "Kamis", "Jumat", "Sabtu"];
+            const sekarang = new Date();
+            document.getElementById('dateMasehi').innerText = hariList[sekarang.getDay()] + ", " + sekarang.toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
+        });
+    </script>
+</body>
+</html>
