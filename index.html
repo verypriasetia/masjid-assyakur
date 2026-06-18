@@ -5,21 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Display Masjid Assyakur Jone</title>
     <link rel="stylesheet" href="style.css">
-    <style>
-        /* Tambahan CSS sesuai permintaan */
-        .clock-label {
-            font-family: 'Times New Roman', Times, serif;
-            color: #ffffff;
-            font-size: 1.2rem;
-            margin-bottom: 5px;
-            text-transform: uppercase;
-            font-weight: bold;
-            letter-spacing: 1px;
-        }
-        .digital-clock-main {
-            color: #ffffff !important;
-        }
-    </style>
 </head>
 <body>
 
@@ -103,13 +88,12 @@
             <div class="next-prayer-container">
                 <div class="next-prayer-card">
                     <div class="next-prayer-label" id="nextPrayerLabel">WAKTU SHOLAT <span id="nextPrayerName">-</span></div>
-                    <div class="next-prayer-time" id="nextPrayerTime">00:00:00</div>
+                    <div class="next-prayer-time" id="nextPrayerTime">00:00</div>
                     <div class="next-prayer-countdown" id="nextPrayerCountdown">00:00:00</div>
                 </div>
             </div>
 
             <div class="live-clock-card">
-                <!-- Penambahan teks Waktu Sekarang di atas jam -->
                 <div class="clock-label">Waktu Sekarang</div>
                 <div class="digital-clock-main" id="clock">00:00:00</div>
                 <div class="date-masehi" id="dateMasehi">-</div>
@@ -129,8 +113,8 @@
 
     <script src="combined.js"></script>
     <script>
-        // Logika Pergantian Informasi Slide Tengah (Fade 3s, Tampil 30s)
         document.addEventListener('DOMContentLoaded', () => {
+            // Logika Pergantian Informasi Slide Tengah (Fade 3s, Tampil 30s)
             const container = document.getElementById('infoUpdateContent');
             const infoList = (typeof dataMasjid !== 'undefined' && dataMasjid.infoUpdate) ? dataMasjid.infoUpdate : [];
             let index = 0;
@@ -143,19 +127,36 @@
                     container.innerText = infoList[index];
                     container.classList.add('show');
                     index = (index + 1) % infoList.length;
-                }, 3000); // Durasi transisi hilangnya teks
+                }, 3000);
             }
 
             if (infoList.length > 0) {
                 container.innerText = infoList[0];
                 index = 1;
-                setInterval(updateInfo, 36000); // 30 detik tampil + 6 detik transisi masuk/keluar
+                setInterval(updateInfo, 36000);
             }
 
             // Injeksi teks Tanggal Hari Ini Masehi
             const hariList = ["Minggu", "Senin", "Selasa", "Rabu", "Kamis", "Jumat", "Sabtu"];
             const sekarang = new Date();
             document.getElementById('dateMasehi').innerText = hariList[sekarang.getDay()] + ", " + sekarang.toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
+
+            // ==========================================================================
+            // LOGIKA FILTER DETIK UNTUK NEXT PRAYER TIME (hh:mm)
+            // ==========================================================================
+            // Karena data waktu sholat diupdate terus oleh 'combined.js', kita buat pemantau 
+            // otomatis agar jika teks berubah menjadi hh:mm:ss, langsung dipotong menjadi hh:mm
+            const targetPrayerTime = document.getElementById('nextPrayerTime');
+            if (targetPrayerTime) {
+                const observer = new MutationObserver(() => {
+                    let currentText = targetPrayerTime.innerText.trim();
+                    // Jika teks berisi format hh:mm:ss (8 karakter), potong menjadi 5 karakter (hh:mm)
+                    if (currentText.length === 8 && currentText.includes(':')) {
+                        targetPrayerTime.innerText = currentText.substring(0, 5);
+                    }
+                });
+                observer.observe(targetPrayerTime, { childList: true, characterData: true, subtree: true });
+            }
         });
     </script>
 </body>
