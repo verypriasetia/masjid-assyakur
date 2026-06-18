@@ -268,13 +268,15 @@ main {
     flex-direction: column;
     justify-content: flex-start; /* Rapat Atas */
 }
+
+/* PERUBAHAN: Menghapus total background semi-transparan (layer pad) pada kontainer utama */
 .next-prayer-card {
-    background: rgba(0, 0, 0, 0.6);
-    border: 2px solid rgba(0, 255, 204, 0.3);
-    border-radius: 12px;
-    padding: 20px 15px;
+    background: transparent;
+    border: none;
+    border-radius: 0;
+    padding: 10px 0;
     text-align: center;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.6);
+    box-shadow: none;
 }
 .next-prayer-label {
     font-size: 1.2rem;
@@ -282,29 +284,37 @@ main {
     color: #ffcc00; /* Teks Utama Warna Kuning Sesuai Permintaan */
     text-transform: uppercase;
     letter-spacing: 0.5px;
-    margin-bottom: 10px;
+    margin-bottom: 8px;
 }
 
-/* PERUBAHAN: Waktu Sholat Datang dibuat Times New Roman, 150% lebih besar, dan gendut */
+/* PERUBAHAN: Ditambahkan shadow hitam tebal berkali-kali agar terlihat solid dan gendut */
 .next-prayer-time {
     font-family: 'Times New Roman', Times, serif;
-    font-size: 3.45rem; /* Naik 150% dari 2.3rem */
+    font-size: 3.45rem; /* 150% lebih besar */
     font-weight: 900;    /* Sangat Tebal/Gendut */
     color: #ffffff;
     line-height: 1.1;
     margin-bottom: 12px;
-    letter-spacing: -1px; /* Merapatkan huruf agar terlihat lebih padat/gendut */
+    letter-spacing: -1px;
+    text-shadow: 4px 4px 0px #000000, 
+                 -4px -4px 0px #000000, 
+                 4px -4px 0px #000000, 
+                 -4px 4px 0px #000000,
+                 0px 4px 8px rgba(0, 0, 0, 1);
 }
+
+/* PERUBAHAN: Layer pad dipertahankan HANYA pada bagian countdown ini saja */
 .next-prayer-countdown {
     font-family: 'Robotron', monospace;
     font-size: 2.3rem;
     color: #ef4444; /* Countdown Warna Merah Mencolok/Menunggu */
-    background: rgba(239, 68, 68, 0.1);
-    padding: 5px 10px;
-    border-radius: 6px;
-    border: 1px solid rgba(239, 68, 68, 0.3);
+    background: rgba(0, 0, 0, 0.7); /* Layer pad khusus countdown */
+    padding: 6px 15px;
+    border-radius: 8px;
+    border: 1px solid rgba(239, 68, 68, 0.4);
     display: inline-block;
-    min-width: 80%;
+    min-width: 85%;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.6);
 }
 
 /* Sektor Jam & Penanggalan (Rapat Bawah) */
@@ -328,15 +338,15 @@ main {
     letter-spacing: 0.5px;
 }
 
-/* PERUBAHAN: Waktu Sekarang dibuat Times New Roman, Putih, 150% lebih besar, dan gendut */
 .digital-clock-main {
     font-family: 'Times New Roman', Times, serif;
-    font-size: 3.6rem; /* Naik 150% dari 2.4rem */
+    font-size: 3.6rem; /* 150% lebih besar */
     font-weight: 900;   /* Sangat Tebal/Gendut */
     color: #ffffff !important;
     line-height: 1.1;
     margin-bottom: 6px;
-    letter-spacing: -1px; /* Merapatkan huruf agar terlihat lebih padat/gendut */
+    letter-spacing: -1px;
+    text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.9);
 }
 .date-masehi {
     font-size: 1.05rem;
