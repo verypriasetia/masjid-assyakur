@@ -372,7 +372,7 @@ footer {
     animation: marqueeAnimation 250s linear infinite;
     font-size: 1.4rem;
     font-weight: 600;
-    color: #ffcc00;
+    color: #ef4444;
 }
 @keyframes marqueeAnimation {
     0% { transform: translate3d(0, 0, 0); }
