@@ -369,7 +369,7 @@ footer {
     display: inline-block;
     white-space: nowrap;
     padding-left: 100%;
-    animation: marqueeAnimation 60s linear infinite;
+    animation: marqueeAnimation 100s linear infinite;
     font-size: 1.4rem;
     font-weight: 600;
     color: #ffffff;
