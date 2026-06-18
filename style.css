@@ -1,405 +1,410 @@
 /* ==========================================================================
-   1. REGISTRASI FONT DOT-MATRIX LOKAL
-   ========================================================================== */
+REGISTRASI FONT DOT-MATRIX LOKAL
+========================================================================== */
 @font-face {
-    font-family: 'Robotron';
-    src: url('robotronfontelit.otf') format('truetype'),
-         url('robotronfontelit.otf') format('otf');
-    font-weight: normal;
-    font-style: normal;
+font-family: 'Robotron';
+src: url('robotronfontelit.otf') format('truetype'),
+url('robotronfontelit.otf') format('otf');
+font-weight: normal;
+font-style: normal;
 }
 
 /* ==========================================================================
-   2. GLOBAL RESET & LAYOUT TV MONITOR SYSTEM
-   ========================================================================== */
-* {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
+2. GLOBAL RESET & LAYOUT TV MONITOR SYSTEM
+========================================================================== */
+
+{
+box-sizing: border-box;
+margin: 0;
+padding: 0;
 }
 
 html {
-    font-size: 1.0vw; /* Kunci Skala Font Berbasis Ukuran Layar TV Monitor */
+font-size: 1.0vw; /* Kunci Skala Font Berbasis Ukuran Layar TV Monitor */
 }
 
 body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background: url('background.jpg') no-repeat center center fixed;
-    background-size: 100% 100%;
-    color: #ffffff;
-    height: 100vh;
-    overflow: hidden;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.9);
+font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+background: url('background.jpg') no-repeat center center fixed;
+background-size: 100% 100%;
+color: #ffffff;
+height: 100vh;
+overflow: hidden;
+display: flex;
+flex-direction: column;
+justify-content: space-between;
+text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.9);
 }
 
 /* ==========================================================================
-   3. SUSUN ATUR HEADER UTAMA (Tinggi 15% Mutlak)
-   ========================================================================== */
+3. SUSUN ATUR HEADER UTAMA (Tinggi 15% Mutlak)
+========================================================================== */
 header {
-    height: 15vh;
-    display: flex;
-    align-items: center;
-    background: rgba(0, 0, 0, 0.8);
-    padding: 0 25px;
-    border-bottom: 4px solid #00ffcc;
+height: 15vh;
+display: flex;
+align-items: center;
+background: rgba(0, 0, 0, 0.8);
+padding: 0 25px;
+border-bottom: 4px solid #00ffcc;
 }
 .logo-container {
-    height: 85%;
-    display: flex;
-    align-items: center;
-    margin-top: 5px;
-    margin-left: 5px;
+height: 85%;
+display: flex;
+align-items: center;
+margin-top: 5px;
+margin-left: 5px;
 }
 .logo-container img {
-    height: 100%;
-    width: auto;
+height: 100%;
+width: auto;
 }
 .title-container {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    margin-left: 20px;
+display: flex;
+flex-direction: column;
+justify-content: center;
+margin-left: 20px;
 }
 .title-container h1 {
-    font-size: 2.3rem;
-    font-weight: 800;
-    color: #00ffcc;
-    line-height: 1.1;
-    margin-bottom: 2px;
+font-size: 2.3rem;
+font-weight: 800;
+color: #00ffcc;
+line-height: 1.1;
+margin-bottom: 2px;
 }
 .title-container h2 {
-    font-size: 1.15rem;
-    color: #ffffff;
-    font-weight: 600;
+font-size: 1.15rem;
+color: #ffffff;
+font-weight: 600;
 }
 .title-container h3 {
-    font-size: 0.95rem;
-    color: #cbd5e1;
-    font-weight: 400;
+font-size: 0.95rem;
+color: #cbd5e1;
+font-weight: 400;
 }
 
 /* ==========================================================================
-   4. DISTRIBUSI KANDUNGAN UTAMA (Tinggi Sisa Layar 73%)
-   ========================================================================== */
+4. DISTRIBUSI KANDUNGAN UTAMA (Tinggi Sisa Layar 73%)
+========================================================================== */
 main {
-    display: flex;
-    flex: 1;
-    height: 73vh;
-    padding: 15px 25px;
-    gap: 20px;
-    align-items: stretch;
+display: flex;
+flex: 1;
+height: 73vh;
+padding: 15px 25px;
+gap: 20px;
+align-items: stretch;
 }
 
-/* Lebar Komponen Berbasis Persentase Mutlak */
+/* Lebar Komponen Berbasis Persentase Mutlak /
 .left-column {
-    width: 30%; /* Sektor Kiri */
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
+width: 30%; / Sektor Kiri /
+display: flex;
+flex-direction: column;
+justify-content: space-between;
 }
 .center-column {
-    width: 45%; /* Sektor Tengah */
-    display: flex;
-    flex-direction: column;
+width: 45%; / Sektor Tengah /
+display: flex;
+flex-direction: column;
 }
 .right-column {
-    width: 20%; /* Sektor Kanan */
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between; /* Memaksa Waktu Sholat ke Atas & Jam Digital ke Bawah */
+width: 20%; / Sektor Kanan /
+display: flex;
+flex-direction: column;
+justify-content: space-between; / Memaksa Waktu Sholat ke Atas & Jam Digital ke Bawah */
 }
 
 /* Kerangka Dasar Kotak Informasi (Card) */
 .card {
-    background: rgba(10, 25, 20, 0.85);
-    border-radius: 12px;
-    padding: 15px 20px;
-    border: 1px solid rgba(0, 255, 204, 0.2);
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.8);
+background: rgba(10, 25, 20, 0.85);
+border-radius: 12px;
+padding: 15px 20px;
+border: 1px solid rgba(0, 255, 204, 0.2);
+box-shadow: 0 6px 20px rgba(0, 0, 0, 0.8);
 }
 .card-title {
-    font-size: 1.15rem;
-    color: #00ffcc;
-    border-bottom: 2px solid #00ffcc;
-    padding-bottom: 4px;
-    margin-bottom: 8px;
-    text-transform: uppercase;
-    font-weight: 700;
-    letter-spacing: 0.5px;
+font-size: 1.15rem;
+color: #00ffcc;
+border-bottom: 2px solid #00ffcc;
+padding-bottom: 4px;
+margin-bottom: 8px;
+text-transform: uppercase;
+font-weight: 700;
+letter-spacing: 0.5px;
 }
 
 /* ==========================================================================
-   5. DETAIL SEKTOR KIRI (Tinggi Mutlak Per Item = 22.5%)
-   ========================================================================== */
+5. DETAIL SEKTOR KIRI (Tinggi Mutlak Per Item = 22.5%)
+========================================================================== */
 .jumat-card, .kas-card, .rek-card {
-    height: 22.5vh;
+height: 22.5vh;
 }
 
-/* Tabel Sholat Jumat */
+/* Tabel Sholat Jumat /
 .sub-date {
-    font-size: 0.95rem;
-    color: #ffcc00;
-    margin-top: -6px;
-    margin-bottom: 6px;
-    font-weight: 600;
+font-size: 0.95rem;
+color: #ffcc00;
+margin-top: -6px;
+margin-bottom: 6px;
+font-weight: 600;
 }
 .info-table {
-    width: 100%;
-    border-collapse: collapse;
+width: 100%;
+border-collapse: collapse;
 }
 .info-table td {
-    padding: 5px 0;
-    font-size: 1.05rem;
-    vertical-align: top;
+padding: 5px 0;
+font-size: 1.05rem;
+vertical-align: top;
 }
 .jumat-table td.label {
-    width: 65px; /* Jarak 2 spasi setelah kata Khatib teratur rata */
-    color: #e2e8f0;
+width: 65px; / Jarak 2 spasi setelah kata Khatib teratur rata */
+color: #e2e8f0;
 }
 .jumat-table td.separator {
-    width: 20px;
-    text-align: center;
-    color: #00ffcc;
+width: 20px;
+text-align: center;
+color: #00ffcc;
 }
 .jumat-table td.value {
-    color: #ffffff;
-    font-weight: 600;
+color: #ffffff;
+font-weight: 600;
 }
 
-/* Penjajaran Kas Keuangan Rapat Kiri-Kanan */
+/* Penjajaran Kas Keuangan Rapat Kiri-Kanan /
 .kas-table td.label-left {
-    text-align: left;
-    color: #e2e8f0;
+text-align: left;
+color: #e2e8f0;
 }
 .kas-table td.value-right {
-    text-align: right;
-    font-family: monospace;
-    font-weight: bold;
-    font-size: 1.1rem;
-    color: #ffffff;
+text-align: right;
+font-family: monospace;
+font-weight: bold;
+font-size: 1.1rem;
+color: #ffffff;
 }
 .saldo-row {
-    border-top: 1px dashed rgba(255, 255, 255, 0.3);
+border-top: 1px dashed rgba(255, 255, 255, 0.3);
 }
 .highlight-saldo-label {
-    color: #ef4444 !important; /* Warna pembeda Merah */
-    font-weight: 800 !important;
+color: #ef4444 !important; / Warna pembeda Merah /
+font-weight: 800 !important;
 }
 .highlight-saldo-val {
-    color: #22c55e !important; /* Angka saldo Hijau Cerah */
-    font-weight: 800 !important;
-    font-size: 1.25rem !important;
+color: #22c55e !important; / Angka saldo Hijau Cerah */
+font-weight: 800 !important;
+font-size: 1.25rem !important;
 }
 
-/* Rekening Box */
+/* Box Rekening */
 .rek-container {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    height: calc(100% - 30px);
+display: flex;
+flex-direction: column;
+align-items: center;
+justify-content: center;
+height: calc(100% - 30px);
 }
 .rek-bank {
-    font-size: 1.2rem;
-    color: #ffcc00;
-    font-weight: bold;
-    margin-bottom: 2px;
+font-size: 1.2rem;
+color: #ffcc00;
+font-weight: bold;
+margin-bottom: 2px;
 }
 .rek-number {
-    font-size: 1.5rem;
-    font-family: monospace;
-    color: #ffffff;
-    background: rgba(0, 0, 0, 0.4);
-    padding: 2px 15px;
-    border-radius: 6px;
-    letter-spacing: 1px;
-    border: 1px solid rgba(0, 255, 204, 0.3);
+font-size: 1.5rem;
+font-family: monospace;
+color: #ffffff;
+background: rgba(0, 0, 0, 0.4);
+padding: 2px 15px;
+border-radius: 6px;
+letter-spacing: 1px;
+border: 1px solid rgba(0, 255, 204, 0.3);
 }
 .rek-owner {
-    font-size: 0.95rem;
-    color: #cbd5e1;
-    margin-top: 4px;
+font-size: 0.95rem;
+color: #cbd5e1;
+margin-top: 4px;
 }
 
 /* ==========================================================================
-   6. DETAIL SEKTOR TENGAH (Papan Informasi Masjid)
-   ========================================================================== */
+6. DETAIL SEKTOR TENGAH (Papan Informasi Masjid)
+========================================================================== /
 .info-board-card {
-    height: 100%; /* Setinggi gabungan komponen kiri (22.5 x 3) */
-    display: flex;
-    flex-direction: column;
+height: 100%; / Setinggi gabungan komponen kiri (22.5 x 3) /
+display: flex;
+flex-direction: column;
 }
 .info-board-title {
-    font-size: 1.4rem;
-    text-align: center;
-    font-weight: 800;
-    padding-bottom: 8px;
-    border-bottom: 2px dashed rgba(0, 255, 204, 0.4);
-    margin-bottom: 20px;
+font-size: 1.4rem;
+text-align: center;
+font-weight: 800;
+padding-bottom: 8px;
+border-bottom: 2px dashed rgba(0, 255, 204, 0.4);
+margin-bottom: 20px;
 }
 .info-slider-container {
-    flex: 1;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 0 10px;
+flex: 1;
+display: flex;
+align-items: center;
+justify-content: center;
+padding: 0 10px;
 }
 .info-fade-text {
-    font-size: 1.55rem;
-    line-height: 1.5;
-    text-align: center;
-    font-weight: 600;
-    color: #ffffff;
-    opacity: 0;
-    transition: opacity 3s ease-in-out; /* Sesuai spek transisi masuk/keluar 3 detik */
+font-size: 1.55rem;
+line-height: 1.5;
+text-align: center;
+font-weight: 600;
+color: #ffffff;
+opacity: 0;
+transition: opacity 3s ease-in-out; / Sesuai spek transisi masuk/keluar 3 detik */
 }
 .info-fade-text.show {
-    opacity: 1;
+opacity: 1;
 }
 
 /* ==========================================================================
-   7. DETAIL SEKTOR KANAN (Hanya Tampilan Salat Mendatang & Jam Sekarang)
-   ========================================================================== */
+7. DETAIL SEKTOR KANAN (Hanya Tampilan Salat Mendatang & Jam Sekarang)
+========================================================================== /
 .next-prayer-container {
-    display: flex;
-    flex-direction: column;
-    justify-content: flex-start; /* Rapat Atas */
+display: flex;
+flex-direction: column;
+justify-content: flex-start; / Rapat Atas /
 }
 .next-prayer-card {
-    background: rgba(0, 0, 0, 0.6);
-    border: 2px solid rgba(0, 255, 204, 0.3);
-    border-radius: 12px;
-    padding: 20px 15px;
-    text-align: center;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.6);
+background: rgba(0, 0, 0, 0.6);
+border: 2px solid rgba(0, 255, 204, 0.3);
+border-radius: 12px;
+padding: 20px 15px;
+text-align: center;
+box-shadow: 0 4px 15px rgba(0, 0, 0, 0.6);
 }
 .next-prayer-label {
-    font-size: 1.2rem;
-    font-weight: 800;
-    color: #ffcc00; /* Teks Utama Warna Kuning Sesuai Permintaan */
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    margin-bottom: 10px;
+font-size: 1.2rem;
+font-weight: 800;
+color: #ffcc00; / Teks Utama Warna Kuning Sesuai Permintaan */
+text-transform: uppercase;
+letter-spacing: 0.5px;
+margin-bottom: 10px;
 }
+
+/* EDIT: Waktu Sholat Datang dibuat Times New Roman, 150% lebih besar, dan gendut /
 .next-prayer-time {
-    font-family: 'Times New Roman', Times, serif;
-    font-size: 2.3rem;
-    color: #ffffff;
-    line-height: 1.2;
-    margin-bottom: 12px;
-    letter-spacing: 1px;
+font-family: 'Times New Roman', Times, serif;
+font-size: 3.45rem; / Naik 150% dari 2.3rem /
+font-weight: 900;    / Sangat tebal / lebih gendut /
+color: #ffffff;
+line-height: 1.1;
+margin-bottom: 12px;
+letter-spacing: -1px; / Merapatkan huruf agar terlihat padat /
 }
 .next-prayer-countdown {
-    font-family: 'Robotron', monospace;
-    font-size: 2.3rem;
-    color: #ef4444; /* Countdown Warna Merah Mencolok/Menunggu */
-    background: rgba(239, 68, 68, 0.1);
-    padding: 5px 10px;
-    border-radius: 6px;
-    border: 1px solid rgba(239, 68, 68, 0.3);
-    display: inline-block;
-    min-width: 80%;
+font-family: 'Robotron', monospace;
+font-size: 2.3rem;
+color: #ef4444; / Countdown Warna Merah Mencolok/Menunggu */
+background: rgba(239, 68, 68, 0.1);
+padding: 5px 10px;
+border-radius: 6px;
+border: 1px solid rgba(239, 68, 68, 0.3);
+display: inline-block;
+min-width: 80%;
 }
 
-/* Sektor Jam & Penanggalan (Rapat Bawah) */
+/* Sektor Jam & Penanggalan (Rapat Bawah) /
 .live-clock-card {
-    background: rgba(0, 0, 0, 0.75);
-    border-radius: 12px;
-    padding: 15px;
-    text-align: center;
-    border-top: 4px solid #ffcc00;
-    margin-top: auto; /* Memaksa komponen terdorong ke paling bawah kolom */
-    box-shadow: 0 -4px 15px rgba(0, 0, 0, 0.5);
+background: rgba(0, 0, 0, 0.75);
+border-radius: 12px;
+padding: 15px;
+text-align: center;
+border-top: 4px solid #ffcc00;
+margin-top: auto; / Memaksa komponen terdorong ke paling bawah kolom */
+box-shadow: 0 -4px 15px rgba(0, 0, 0, 0.5);
 }
 
-/* TAMBAHAN BARU: Gaya untuk teks "Waktu Sekarang" */
 .clock-label {
-    font-family: 'Times New Roman', Times, serif;
-    color: #ffffff;
-    font-size: 1.25rem;
-    margin-bottom: 4px;
-    text-transform: uppercase;
-    font-weight: bold;
-    letter-spacing: 0.5px;
+font-family: 'Times New Roman', Times, serif;
+color: #ffffff;
+font-size: 1.25rem;
+margin-bottom: 4px;
+text-transform: uppercase;
+font-weight: bold;
+letter-spacing: 0.5px;
 }
 
+/* EDIT: Jam Sekarang dibuat Times New Roman, Putih, 150% lebih besar, dan gendut /
 .digital-clock-main {
-    font-family: 'Times New Roman', Times, serif;
-    font-size: 2.4rem;
-    color: #ffffff !important; /* Diubah menjadi PUTIH sesuai permintaan OmVery */
-    line-height: 1.1;
-    margin-bottom: 6px;
-    letter-spacing: 1px;
+font-family: 'Times New Roman', Times, serif;
+font-size: 3.6rem; / Naik 150% dari 2.4rem /
+font-weight: 900;   / Sangat tebal / lebih gendut /
+color: #ffffff !important;
+line-height: 1.1;
+margin-bottom: 6px;
+letter-spacing: -1px; / Merapatkan huruf agar terlihat padat */
 }
 .date-masehi {
-    font-size: 1.05rem;
-    color: #ffffff;
-    font-weight: 600;
+font-size: 1.05rem;
+color: #ffffff;
+font-weight: 600;
 }
 .date-hijriah {
-    font-size: 1.15rem;
-    color: #00ffcc;
-    font-weight: bold;
-    margin-top: 3px;
+font-size: 1.15rem;
+color: #00ffcc;
+font-weight: bold;
+margin-top: 3px;
 }
 
 /* ==========================================================================
-   8. FOOTER RUNNING TEXT (Tinggi Mutlak 12%)
-   ========================================================================== */
+8. FOOTER RUNNING TEXT (Tinggi Mutlak 12%)
+========================================================================== */
 footer {
-    height: 12vh;
-    background: #000000;
-    border-top: 3px solid #ffcc00;
-    display: flex;
-    align-items: center;
-    overflow: hidden;
+height: 12vh;
+background: #000000;
+border-top: 3px solid #ffcc00;
+display: flex;
+align-items: center;
+overflow: hidden;
 }
 .marquee-label {
-    background: #ffcc00;
-    color: #000000;
-    font-weight: 900;
-    font-size: 1.2rem;
-    padding: 0 20px;
-    height: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 10;
-    box-shadow: 5px 0 15px rgba(0, 0, 0, 0.5);
+background: #ffcc00;
+color: #000000;
+font-weight: 900;
+font-size: 1.2rem;
+padding: 0 20px;
+height: 100%;
+display: flex;
+align-items: center;
+justify-content: center;
+z-index: 10;
+box-shadow: 5px 0 15px rgba(0, 0, 0, 0.5);
 }
 .marquee-container {
-    flex: 1;
-    overflow: hidden;
-    position: relative;
-    display: flex;
-    align-items: center;
+flex: 1;
+overflow: hidden;
+position: relative;
+display: flex;
+align-items: center;
 }
 .marquee-content {
-    font-family: 'Robotron', monospace;
-    display: inline-block;
-    white-space: nowrap;
-    padding-left: 100%;
-    animation: marqueeAnimation 150s linear infinite;
-    font-size: 2.8rem;
-    font-weight: 600;
-    color: #ef4444;
-    letter-spacing: 1px;
+font-family: 'Robotron', monospace;
+display: inline-block;
+white-space: nowrap;
+padding-left: 100%;
+animation: marqueeAnimation 150s linear infinite;
+font-size: 2.8rem;
+font-weight: 600;
+color: #ef4444;
+letter-spacing: 1px;
 }
 @keyframes marqueeAnimation {
-    0% { transform: translate3d(0, 0, 0); }
-    100% { transform: translate3d(-100%, 0, 0); }
+0% { transform: translate3d(0, 0, 0); }
+100% { transform: translate3d(-100%, 0, 0); }
 }
 
 /* ==========================================================================
-   9. INDIKATOR BERKEDIP (Blink Effects)
-   ========================================================================== */
+9. INDIKATOR BERKEDIP (Blink Effects)
+========================================================================== */
 .blink-green {
-    animation: blinkGreenAni 1.5s infinite alternate;
+animation: blinkGreenAni 1.5s infinite alternate;
 }
 @keyframes blinkGreenAni {
-    0% { color: #4ade80; text-shadow: 0 0 10px rgba(74, 222, 128, 0.5); }
-    100% { color: #16a34a; text-shadow: 0 0 2px rgba(22, 163, 74, 0.2); }
+0% { color: #4ade80; text-shadow: 0 0 10px rgba(74, 222, 128, 0.5); }
+100% { color: #16a34a; text-shadow: 0 0 2px rgba(22, 163, 74, 0.2); }
 }
