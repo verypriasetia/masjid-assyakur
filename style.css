@@ -132,7 +132,7 @@ main {
 }
 
 /* ==========================================================================
-   5. DETAIL SEKTOR KIRI (Tinggi Mutlak Per Item = 22.5%)
+   5. DETAIL SEKTOR KIRI (Tinggi Mutlak Per Item = 23%)
    ========================================================================== */
 .jumat-card, .kas-card, .rek-card {
     height: 22.5vh;
@@ -152,7 +152,7 @@ main {
 }
 .info-table td {
     padding: 5px 0;
-    font-size: 1.05rem;
+    font-size: 1.1rem;
     vertical-align: top;
 }
 .jumat-table td.label {
@@ -209,7 +209,7 @@ main {
     margin-bottom: 2px;
 }
 .rek-number {
-    font-size: 1.5rem;
+    font-size: 1.8rem;
     font-family: monospace;
     color: #ffffff;
     background: rgba(0, 0, 0, 0.4);
