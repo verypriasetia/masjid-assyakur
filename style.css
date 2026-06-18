@@ -280,12 +280,12 @@ main {
 }
 .next-prayer-label {
     font-family: 'Times New Roman', Times, serif;
-    color: #ffcc00; /* Teks Utama Warna Kuning Sesuai Permintaan */
     font-size: 1.25rem;
-    margin-bottom: 4px;
+    font-weight: 800;
+    color: #ffcc00; /* Teks Utama Warna Kuning Sesuai Permintaan */
     text-transform: uppercase;
-    font-weight: bold;
     letter-spacing: 0.5px;
+    margin-bottom: 8px;
 }
 
 /* PERUBAHAN: Ditambahkan shadow hitam tebal berkali-kali agar terlihat solid dan gendut */
