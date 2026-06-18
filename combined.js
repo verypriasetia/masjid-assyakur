@@ -149,19 +149,66 @@ setInterval(() => {
 /* ==========================================================================
    BAGIAN 3: INJEKSI DATA KAS, PETUGAS & RUNNING TEXT
    ========================================================================== */
-window.addEventListener('load', () => {
-    if (typeof dataMasjid !== 'undefined') {
-        if(document.getElementById('tanggalJumat')) document.getElementById('tanggalJumat').innerText = dataMasjid.tanggalJumat || '-';
-        if(document.getElementById('khatib')) document.getElementById('khatib').innerText = dataMasjid.khatib || '-';
-        if(document.getElementById('imam')) document.getElementById('imam').innerText = dataMasjid.imam || '-';
-        if(document.getElementById('muadzin')) document.getElementById('muadzin').innerText = dataMasjid.muadzin || '-';
-        
-        if(document.getElementById('saldoAwal')) document.getElementById('saldoAwal').innerText = "Rp " + (dataMasjid.saldoAwal || '0');
-        if(document.getElementById('pemasukan')) document.getElementById('pemasukan').innerText = "Rp " + (dataMasjid.pemasukan || '0');
-        if(document.getElementById('pengeluaran')) document.getElementById('pengeluaran').innerText = "Rp " + (dataMasjid.pengeluaran || '0');
-        if(document.getElementById('totalSaldo')) document.getElementById('totalSaldo').innerText = "Rp " + (dataMasjid.totalSaldo || '0');
+/* ==========================================================================\n   BAGIAN 5: INTEGRASI OTOMATIS GOOGLE SHEETS VIA FETCH API
+   ========================================================================== */
 
-        if(document.getElementById('runText1')) document.getElementById('runText1').innerText = dataMasjid.runningText || '';
-        if(document.getElementById('runText2')) document.getElementById('runText2').innerText = dataMasjid.runningText || '';
-    }
+// TARUH URL WEB APP OM YANG DI-COPY DARI LANGKAH 3 DI SINI:
+const URL_GOOGLE_SHEET = "https://script.google.com/macros/s/AKfycbzbz9r75Jkg9Kd2geoNRWzXp2IAzJC47Mh7gZsPMDXF7MvGL_JM6StX7PocTC2yLE3WLg/exec";
+
+function muatDataDariGoogleSheet() {
+    fetch(URL_GOOGLE_SHEET)
+        .then(response => response.json())
+        .then(dataMasjid => {
+            console.log("Data berhasil dimuat dari Google Sheet:", dataMasjid);
+
+            // Injeksi Petugas Jumat
+            if(document.getElementById('tanggalJumat')) document.getElementById('tanggalJumat').innerText = dataMasjid.tanggalJumat || '-';
+            if(document.getElementById('khatib')) document.getElementById('khatib').innerText = dataMasjid.khatib || '-';
+            if(document.getElementById('imam')) document.getElementById('imam').innerText = dataMasjid.imam || '-';
+            if(document.getElementById('muadzin')) document.getElementById('muadzin').innerText = dataMasjid.muadzin || '-';
+            
+            // Injeksi Saldo Keuangan
+            if(document.getElementById('saldoAwal')) document.getElementById('saldoAwal').innerText = "Rp " + (dataMasjid.saldoAwal || '0');
+            if(document.getElementById('pemasukan')) document.getElementById('pemasukan').innerText = "Rp " + (dataMasjid.pemasukan || '0');
+            if(document.getElementById('pengeluaran')) document.getElementById('pengeluaran').innerText = "Rp " + (dataMasjid.pengeluaran || '0');
+            if(document.getElementById('totalSaldo')) document.getElementById('totalSaldo').innerText = "Rp " + (dataMasjid.totalSaldo || '0');
+
+            // Injeksi Running Text Footer
+            if(document.getElementById('runText1')) document.getElementById('runText1').innerText = dataMasjid.runningText || '';
+            if(document.getElementById('runText2')) document.getElementById('runText2').innerText = dataMasjid.runningText || '';
+
+            // Injeksi Slide Informasi Tengah secara dinamis
+            const container = document.getElementById('infoUpdateContent');
+            if (container && dataMasjid.infoUpdate && dataMasjid.infoUpdate.length > 0) {
+                const infoList = dataMasjid.infoUpdate;
+                let index = 0;
+                
+                // Set isi pertama
+                container.innerText = infoList[0];
+                index = 1;
+
+                // Bersihkan interval lama jika ada sebelum membuat yang baru
+                if (window.intervalInfoMasjid) clearInterval(window.intervalInfoMasjid);
+
+                window.intervalInfoMasjid = setInterval(() => {
+                    container.classList.remove('show');
+                    setTimeout(() => {
+                        container.innerText = infoList[index];
+                        container.classList.add('show');
+                        index = (index + 1) % infoList.length;
+                    }, 3000);
+                }, 36000);
+            }
+        })
+        .catch(error => {
+            console.error("Gagal mengambil data dari Google Sheet, menggunakan data lokal / kosong:", error);
+        });
+}
+
+// Jalankan fungsi saat web dibuka
+window.addEventListener('load', () => {
+    muatDataDariGoogleSheet();
+    
+    // Opsional: Cek data baru secara otomatis setiap 5 menit (300000 ms) tanpa perlu refresh browser
+    setInterval(muatDataDariGoogleSheet, 300000);
 });
