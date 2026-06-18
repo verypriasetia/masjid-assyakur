@@ -314,10 +314,22 @@ main {
     margin-top: auto; /* Memaksa komponen terdorong ke paling bawah kolom */
     box-shadow: 0 -4px 15px rgba(0, 0, 0, 0.5);
 }
+
+/* TAMBAHAN BARU: Gaya untuk teks "Waktu Sekarang" */
+.clock-label {
+    font-family: 'Times New Roman', Times, serif;
+    color: #ffffff;
+    font-size: 1.25rem;
+    margin-bottom: 4px;
+    text-transform: uppercase;
+    font-weight: bold;
+    letter-spacing: 0.5px;
+}
+
 .digital-clock-main {
     font-family: 'Robotron', monospace;
     font-size: 2.4rem;
-    color: #ffcc00;
+    color: #ffffff !important; /* Diubah menjadi PUTIH sesuai permintaan OmVery */
     line-height: 1.1;
     margin-bottom: 6px;
     letter-spacing: 1px;
