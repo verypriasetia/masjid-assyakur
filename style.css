@@ -132,7 +132,7 @@ main {
 }
 
 /* ==========================================================================
-   5. DETAIL SEKTOR KIRI (Tinggi Mutlak Per Item = 23%)
+   5. DETAIL SEKTOR KIRI (Tinggi Mutlak Per Item = 22.5%)
    ========================================================================== */
 .jumat-card, .kas-card, .rek-card {
     height: 22.5vh;
@@ -152,7 +152,7 @@ main {
 }
 .info-table td {
     padding: 5px 0;
-    font-size: 1.1rem;
+    font-size: 1.05rem;
     vertical-align: top;
 }
 .jumat-table td.label {
@@ -209,7 +209,7 @@ main {
     margin-bottom: 2px;
 }
 .rek-number {
-    font-size: 1.8rem;
+    font-size: 1.5rem;
     font-family: monospace;
     color: #ffffff;
     background: rgba(0, 0, 0, 0.4);
@@ -269,7 +269,7 @@ main {
     justify-content: flex-start; /* Rapat Atas */
 }
 
-/* PERUBAHAN: Menghapus total background semi-transparan (layer pad) pada kontainer utama */
+/* Tanpa background semi-transparan (layer pad) pada kontainer utama */
 .next-prayer-card {
     background: transparent;
     border: none;
@@ -282,13 +282,13 @@ main {
     font-family: 'Times New Roman', Times, serif;
     font-size: 1.25rem;
     font-weight: 800;
-    color: #ffcc00; /* Teks Utama Warna Kuning Sesuai Permintaan */
+    color: #ffcc00; /* Teks Utama Warna Kuning */
     text-transform: uppercase;
     letter-spacing: 0.5px;
     margin-bottom: 8px;
 }
 
-/* PERUBAHAN: Ditambahkan shadow hitam tebal berkali-kali agar terlihat solid dan gendut */
+/* PERUBAHAN: Text shadow dikurangi ketebalannya sedikit sesuai permintaan */
 .next-prayer-time {
     font-family: 'Times New Roman', Times, serif;
     font-size: 3.45rem; /* 150% lebih besar */
@@ -297,18 +297,18 @@ main {
     line-height: 1.1;
     margin-bottom: 12px;
     letter-spacing: -1px;
-    text-shadow: 4px 4px 0px #000000, 
-                 -4px -4px 0px #000000, 
-                 4px -4px 0px #000000, 
-                 -4px 4px 0px #000000,
-                 0px 4px 8px rgba(0, 0, 0, 1);
+    text-shadow: 2px 2px 0px #000000, 
+                -2px -2px 0px #000000, 
+                 2px -2px 0px #000000, 
+                -2px 2px 0px #000000,
+                 0px 3px 6px rgba(0, 0, 0, 0.8);
 }
 
-/* PERUBAHAN: Layer pad dipertahankan HANYA pada bagian countdown ini saja */
+/* Layer pad dipertahankan HANYA pada bagian countdown ini saja */
 .next-prayer-countdown {
     font-family: 'Robotron', monospace;
     font-size: 2.3rem;
-    color: #ef4444; /* Countdown Warna Merah Mencolok/Menunggu */
+    color: #ef4444; /* Countdown Warna Merah */
     background: rgba(0, 0, 0, 0.7); /* Layer pad khusus countdown */
     padding: 6px 15px;
     border-radius: 8px;
@@ -362,10 +362,10 @@ main {
 }
 
 /* ==========================================================================
-   8. FOOTER RUNNING TEXT (Tinggi Mutlak 10%)
+   8. FOOTER RUNNING TEXT (Tinggi Mutlak 12%)
    ========================================================================== */
 footer {
-    height: 10vh;
+    height: 12vh;
     background: #000000;
     border-top: 3px solid #ffcc00;
     display: flex;
@@ -392,16 +392,21 @@ footer {
     display: flex;
     align-items: center;
 }
+
+/* PERUBAHAN: Diberi efek berpendar neon merah lembut pada font running text */
 .marquee-content {
     font-family: 'Robotron', monospace;
     display: inline-block;
     white-space: nowrap;
     padding-left: 100%;
     animation: marqueeAnimation 150s linear infinite;
-    font-size: 2.33rem;
+    font-size: 2.8rem;
     font-weight: 600;
     color: #ef4444;
     letter-spacing: 1px;
+    text-shadow: 0 0 8px rgba(239, 68, 68, 0.6), 
+                 0 0 15px rgba(239, 68, 68, 0.3),
+                 2px 2px 4px rgba(0, 0, 0, 0.9);
 }
 @keyframes marqueeAnimation {
     0% { transform: translate3d(0, 0, 0); }
