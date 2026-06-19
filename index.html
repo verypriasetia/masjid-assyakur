@@ -102,7 +102,7 @@
                 <div class="clock-label">Waktu Sekarang</div>
                 <div class="digital-clock-main" id="clock">00:00:00</div>
                 <div class="date-masehi" id="dateMasehi">-</div>
-                <div class="date-hijriah" id="dateHijriah">3 Muharram 1448 H</div>
+                <div class="date-hijriah" id="dateHijriah">-</div>
             </div>
         </div>
     </main>
@@ -141,10 +141,23 @@
                 setInterval(updateInfo, 36000);
             }
 
-            // Injeksi teks Tanggal Hari Ini Masehi
+            // Injeksi teks Tanggal Hari Ini Masehi & Perhitungan Otomatis Hijriah
             const hariList = ["Minggu", "Senin", "Selasa", "Rabu", "Kamis", "Jumat", "Sabtu"];
             const sekarang = new Date();
             document.getElementById('dateMasehi').innerText = hariList[sekarang.getDay()] + ", " + sekarang.toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
+
+            try {
+                // Menggunakan format kalender Islam sistem lokal (Umm al-Qura)
+                const opsiHijriah = { day: 'numeric', month: 'long', year: 'numeric' };
+                let formatHijriah = new Intl.DateTimeFormat('id-TN-u-ca-islamic-umalqura', opsiHijriah).format(sekarang);
+                
+                // Standarisasi penamaan akhiran tahun Hijriah menjadi "H"
+                formatHijriah = formatHijriah.replace('AH', 'H').replace('=?','');
+                document.getElementById('dateHijriah').innerText = formatHijriah;
+            } catch (e) {
+                console.error("Format Intl Hijriah tidak didukung sistem browser ini", e);
+                document.getElementById('dateHijriah').innerText = "1 Muharram 1448 H"; // Fallback alternatif aman
+            }
 
             // LOGIKA FILTER DETIK UNTUK NEXT PRAYER TIME (hh:mm)
             const targetPrayerTime = document.getElementById('nextPrayerTime');
