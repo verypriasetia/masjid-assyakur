@@ -50,7 +50,7 @@ function triggerAlarm() {
 }
 
 /* ==========================================================================
-   BAGIAN 2: ENGINE REFRESH CLOCK & COUNTDOWN (SETIAP 1 DETIK)
+   BAGIAN 2: ENGINE REFRESH CLOCK & COUNTDOWN (SETIAP 1 DETIK) - FIXED
    ========================================================================== */
 setInterval(() => {
     const sekarang = new Date();
@@ -76,12 +76,26 @@ setInterval(() => {
     let sholatActive = null;
     let waktuSekarangDetik = (sekarang.getHours() * 3600) + (sekarang.getMinutes() * 60) + sekarang.getSeconds();
 
+    // PERBAIKAN LOGIKA: Berikan toleransi agar jadwal tidak langsung melompat saat adzan tiba
     for (let i = 0; i < daftarSholat.length; i++) {
         let tParts = daftarSholat[i].waktu.split(':');
         let targetDetik = (parseInt(tParts[0]) * 3600) + (parseInt(tParts[1]) * 60);
         
-        if (targetDetik > waktuSekarangDetik) {
-            sholatActive = { nama: daftarSholat[i].nama, waktuStr: daftarSholat[i].waktu + ":00", targetDetik: targetDetik, isBesok: false };
+        let mIqamahConfig = 10; 
+        if (typeof dataMasjid !== 'undefined' && dataMasjid.jedaIqamah && dataMasjid.jedaIqamah[daftarSholat[i].nama]) {
+            mIqamahConfig = parseInt(dataMasjid.jedaIqamah[daftarSholat[i].nama]);
+        }
+        let batasIqamahDetik = mIqamahConfig * 60;
+
+        // Jadwal sholat tetap dipertahankan aktif sampai waktu adzan + durasi iqamah selesai melewati waktu sekarang
+        if (targetDetik + batasIqamahDetik > waktuSekarangDetik) {
+            sholatActive = { 
+                nama: daftarSholat[i].nama, 
+                waktuStr: daftarSholat[i].waktu + ":00", 
+                targetDetik: targetDetik, 
+                batasIqamahDetik: batasIqamahDetik,
+                isBesok: false 
+            };
             break;
         }
     }
@@ -89,36 +103,33 @@ setInterval(() => {
     // Lewat Isya -> Target Subuh Besok
     if (!sholatActive) {
         let tParts = daftarSholat[0].waktu.split(':');
-        sholatActive = { nama: 'SUBUH', waktuStr: daftarSholat[0].waktu + ":00", targetDetik: (parseInt(tParts[0]) * 3600) + (parseInt(tParts[1]) * 60) + 86400, isBesok: true };
+        sholatActive = { 
+            nama: 'SUBUH', 
+            waktuStr: daftarSholat[0].waktu + ":00", 
+            targetDetik: (parseInt(tParts[0]) * 3600) + (parseInt(tParts[1]) * 60) + 86400, 
+            batasIqamahDetik: 15 * 60,
+            isBesok: true 
+        };
     }
 
     let sisaDetik = sholatActive.targetDetik - waktuSekarangDetik;
 
-    const elNama = document.getElementById('nextPrayerName');
+    const elLabel = document.getElementById('nextPrayerLabel');
     const elWaktu = document.getElementById('nextPrayerTime');
     const elCountdown = document.getElementById('nextPrayerCountdown');
-    const elLabel = document.getElementById('nextPrayerLabel');
 
-    if (elNama) elNama.innerText = sholatActive.isBesok ? 'SUBUH (BESOK)' : sholatActive.nama;
     if (elWaktu) elWaktu.innerText = sholatActive.waktuStr;
 
-    // Ambil Batas Jeda Iqamah Sesuai Nama Sholat dari data.js
-    let mIqamahConfig = 10; 
-    if (typeof dataMasjid !== 'undefined' && dataMasjid.jedaIqamah && dataMasjid.jedaIqamah[sholatActive.nama]) {
-        mIqamahConfig = parseInt(dataMasjid.jedaIqamah[sholatActive.nama]);
-    }
-    let batasIqamahDetik = mIqamahConfig * 60;
-
-    // 3. Logika Transisi Adzan & Menunggu Iqamah
-    if (sisaDetik <= 0 && sisaDetik > -batasIqamahDetik && !sholatActive.isBesok) {
-        if (sisaDetik === 0) triggerAlarm(); // Bip waktu adzan tiba
+    // 3. Logika Transisi Adzan & Menunggu Iqamah (FIXED)
+    if (sisaDetik <= 0 && !sholatActive.isBesok) {
+        if (sisaDetik === 0) triggerAlarm(); // Bip tepat waktu adzan masuk
 
         if (elLabel) {
             elLabel.innerHTML = 'MENUNGGU IQAMAH';
-            elLabel.style.color = '#ef4444'; // Merah sesuai spec
+            elLabel.style.color = '#ef4444';
         }
         
-        let sisaIqamah = batasIqamahDetik + sisaDetik;
+        let sisaIqamah = sholatActive.batasIqamahDetik + sisaDetik;
         let mIqamah = String(Math.floor(sisaIqamah / 60)).padStart(2, '0');
         let sIqamah = String(sisaIqamah % 60).padStart(2, '0');
         
@@ -132,7 +143,7 @@ setInterval(() => {
         // Mode Normal Menuju Adzan
         if (elLabel) {
             elLabel.innerHTML = `WAKTU SHOLAT <span id="nextPrayerName">${sholatActive.isBesok ? 'SUBUH (BESOK)' : sholatActive.nama}</span>`;
-            elLabel.style.color = '#ffcc00'; // Kuning standard
+            elLabel.style.color = '#ffcc00';
         }
 
         let jamSisa = String(Math.floor(sisaDetik / 3600)).padStart(2, '0');
@@ -149,7 +160,8 @@ setInterval(() => {
 /* ==========================================================================
    BAGIAN 3: INJEKSI DATA KAS, PETUGAS & RUNNING TEXT
    ========================================================================== */
-/* ==========================================================================\n   BAGIAN 5: INTEGRASI OTOMATIS GOOGLE SHEETS VIA FETCH API
+/* ==========================================================================
+   BAGIAN 5: INTEGRASI OTOMATIS GOOGLE SHEETS VIA FETCH API
    ========================================================================== */
 
 // TARUH URL WEB APP OM YANG DI-COPY DARI LANGKAH 3 DI SINI:
@@ -209,6 +221,6 @@ function muatDataDariGoogleSheet() {
 window.addEventListener('load', () => {
     muatDataDariGoogleSheet();
     
-    // Opsional: Cek data baru secara otomatis setiap 5 menit (300000 ms) tanpa perlu refresh browser
+    // Cek data baru secara otomatis setiap 5 menit (300000 ms) tanpa perlu refresh browser
     setInterval(muatDataDariGoogleSheet, 300000);
 });
