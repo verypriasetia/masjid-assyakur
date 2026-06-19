@@ -132,31 +132,36 @@ main {
 }
 
 /* ==========================================================================
-   5. DETAIL SEKTOR KIRI (Tinggi Mutlak Per Item = 22.5%)
+   5. DETAIL SEKTOR KIRI (Tinggi Mutlak Per Item = 22.5%) - AMAN DI DALAM CARD
    ========================================================================== */
 .jumat-card, .kas-card, .rek-card {
     height: 22.5vh;
+    overflow: hidden; /* Memastikan tidak meluber keluar */
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
 }
 
 /* Tabel Sholat Jumat */
 .sub-date {
-    font-size: 0.95rem;
+    font-size: 0.85rem; /* Kompresi ukuran agar hemat ruang */
     color: #ffcc00;
-    margin-top: -6px;
-    margin-bottom: 6px;
+    margin-top: -4px;
+    margin-bottom: 4px;
     font-weight: 600;
+    text-align: center;
 }
 .info-table {
     width: 100%;
     border-collapse: collapse;
 }
 .info-table td {
-    padding: 5px 0;
-    font-size: 1.05rem;
-    vertical-align: top;
+    padding: 3px 0; /* Dipersempit agar muat sempurna dalam boks */
+    font-size: 0.95rem; 
+    vertical-align: middle;
 }
 .jumat-table td.label {
-    width: 65px; /* Jarak 2 spasi setelah kata Khatib teratur rata */
+    width: 65px; 
     color: #e2e8f0;
 }
 .jumat-table td.separator {
@@ -170,6 +175,9 @@ main {
 }
 
 /* Penjajaran Kas Keuangan Rapat Kiri-Kanan */
+.kas-table {
+    margin-top: 2px;
+}
 .kas-table td.label-left {
     text-align: left;
     color: #e2e8f0;
@@ -178,20 +186,22 @@ main {
     text-align: right;
     font-family: monospace;
     font-weight: bold;
-    font-size: 1.1rem;
+    font-size: 1.0rem; 
     color: #ffffff;
 }
 .saldo-row {
     border-top: 1px dashed rgba(255, 255, 255, 0.3);
 }
 .highlight-saldo-label {
-    color: #ef4444 !important; /* Warna pembeda Merah */
+    color: #ef4444 !important; 
     font-weight: 800 !important;
+    padding-top: 5px !important;
 }
 .highlight-saldo-val {
-    color: #22c55e !important; /* Angka saldo Hijau Cerah */
+    color: #22c55e !important; 
     font-weight: 800 !important;
-    font-size: 1.25rem !important;
+    font-size: 1.15rem !important; 
+    padding-top: 5px !important;
 }
 
 /* Rekening Box */
@@ -200,26 +210,26 @@ main {
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    height: calc(100% - 30px);
+    height: calc(100% - 25px);
 }
 .rek-bank {
-    font-size: 1.2rem;
+    font-size: 1.1rem;
     color: #ffcc00;
     font-weight: bold;
     margin-bottom: 2px;
 }
 .rek-number {
-    font-size: 1.5rem;
+    font-size: 1.35rem;
     font-family: monospace;
     color: #ffffff;
     background: rgba(0, 0, 0, 0.4);
-    padding: 2px 15px;
+    padding: 2px 12px;
     border-radius: 6px;
     letter-spacing: 1px;
     border: 1px solid rgba(0, 255, 204, 0.3);
 }
 .rek-owner {
-    font-size: 0.95rem;
+    font-size: 0.85rem;
     color: #cbd5e1;
     margin-top: 4px;
 }
@@ -228,7 +238,7 @@ main {
    6. DETAIL SEKTOR TENGAH (Papan Informasi Masjid)
    ========================================================================== */
 .info-board-card {
-    height: 100%; /* Setinggi gabungan komponen kiri (22.5 x 3) */
+    height: 100%; 
     display: flex;
     flex-direction: column;
 }
@@ -254,19 +264,19 @@ main {
     font-weight: 600;
     color: #ffffff;
     opacity: 0;
-    transition: opacity 3s ease-in-out; /* Sesuai spek transisi masuk/keluar 3 detik */
+    transition: opacity 3s ease-in-out; 
 }
 .info-fade-text.show {
     opacity: 1;
 }
 
 /* ==========================================================================
-   7. DETAIL SEKTOR KANAN (Hanya Tampilan Salat Mendatang & Jam Sekarang)
+   7. DETAIL SEKTOR KANAN (Tampilan Waktu Sholat Mendatang & Jam Sekarang)
    ========================================================================== */
 .next-prayer-container {
     display: flex;
     flex-direction: column;
-    justify-content: flex-start; /* Rapat Atas */
+    justify-content: flex-start; 
 }
 
 /* Tanpa background semi-transparan (layer pad) pada kontainer utama */
@@ -282,13 +292,13 @@ main {
     font-family: 'Times New Roman', Times, serif;
     font-size: 1.25rem;
     font-weight: 800;
-    color: #ffcc00; /* Teks Utama Warna Kuning */
+    color: #ffcc00; 
     text-transform: uppercase;
     letter-spacing: 0.5px;
     margin-bottom: 8px;
 }
 
-/* PERUBAHAN: Text shadow dikurangi ketebalannya sedikit sesuai permintaan */
+/* PERUBAHAN: Text shadow dikurangi ketebalannya sedikit sesuai spek baru */
 .next-prayer-time {
     font-family: 'Times New Roman', Times, serif;
     font-size: 3.45rem; /* 150% lebih besar */
@@ -297,6 +307,8 @@ main {
     line-height: 1.1;
     margin-bottom: 12px;
     letter-spacing: -1px;
+    text-align: center;
+    display: block;
     text-shadow: 2px 2px 0px #000000, 
                 -2px -2px 0px #000000, 
                  2px -2px 0px #000000, 
@@ -308,8 +320,8 @@ main {
 .next-prayer-countdown {
     font-family: 'Robotron', monospace;
     font-size: 2.3rem;
-    color: #ef4444; /* Countdown Warna Merah */
-    background: rgba(0, 0, 0, 0.7); /* Layer pad khusus countdown */
+    color: #ef4444; 
+    background: rgba(0, 0, 0, 0.7); 
     padding: 6px 15px;
     border-radius: 8px;
     border: 1px solid rgba(239, 68, 68, 0.4);
@@ -325,7 +337,7 @@ main {
     padding: 15px;
     text-align: center;
     border-top: 4px solid #ffcc00;
-    margin-top: auto; /* Memaksa komponen terdorong ke paling bawah kolom */
+    margin-top: auto; 
     box-shadow: 0 -4px 15px rgba(0, 0, 0, 0.5);
 }
 
@@ -393,7 +405,7 @@ footer {
     align-items: center;
 }
 
-/* PERUBAHAN: Diberi efek berpendar neon merah lembut pada font running text */
+/* PERUBAHAN: Efek berpendar neon merah lembut pada running text */
 .marquee-content {
     font-family: 'Robotron', monospace;
     display: inline-block;
