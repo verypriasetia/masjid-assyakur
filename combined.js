@@ -1,5 +1,5 @@
 /* ==========================================================================
-   BAGIAN 1: PUSTAKA PRAYTIMES.JS & KONFIGURASI PASER
+   BAGIAN 1: PUSTAKA PRAYTIMES.JS & KONFIGURASI PASER (MODIFIED)
    ========================================================================== */
 function PrayTimes(method) {
     var timeNames = { imsak: 'Imsak', fajr: 'Fajr', dhuhr: 'Dhuhr', asr: 'Asr', sunset: 'Sunset', isha: 'Isha' },
@@ -16,7 +16,12 @@ function PrayTimes(method) {
     this.adjust = function(params) { for (var id in params) setting[id] = params[id]; };
 
     this.computeTimes = function() {
-        // Simulasi hitungan astronomi Kemenag RI untuk Tanah Grogot / Jone Juni 2026
+        // PERBAIKAN: Jika data jadwal manual dari Sheet 2 tersedia via Fetch, pakai data tersebut
+        if (typeof window.dataMasjidGlobal !== 'undefined' && window.dataMasjidGlobal.jadwalSholatManual) {
+            return window.dataMasjidGlobal.jadwalSholatManual;
+        }
+        
+        // Cadangan (Fallback) jika internet putus / data gagal dimuat dari Google Sheet
         return { imsak: "04:44", fajr: "04:54", dhuhr: "12:18", asr: "15:43", sunset: "18:21", isha: "19:35" };
     };
 
@@ -82,8 +87,8 @@ setInterval(() => {
         let targetDetik = (parseInt(tParts[0]) * 3600) + (parseInt(tParts[1]) * 60);
         
         let mIqamahConfig = 10; 
-        if (typeof dataMasjid !== 'undefined' && dataMasjid.jedaIqamah && dataMasjid.jedaIqamah[daftarSholat[i].nama]) {
-            mIqamahConfig = parseInt(dataMasjid.jedaIqamah[daftarSholat[i].nama]);
+        if (typeof window.dataMasjidGlobal !== 'undefined' && window.dataMasjidGlobal.jedaIqamah && window.dataMasjidGlobal.jedaIqamah[daftarSholat[i].nama]) {
+            mIqamahConfig = parseInt(window.dataMasjidGlobal.jedaIqamah[daftarSholat[i].nama]);
         }
         let batasIqamahDetik = mIqamahConfig * 60;
 
@@ -158,20 +163,23 @@ setInterval(() => {
 }, 1000);
 
 /* ==========================================================================
-   BAGIAN 3: INJEKSI DATA KAS, PETUGAS & RUNNING TEXT
-   ========================================================================== */
-/* ==========================================================================
-   BAGIAN 5: INTEGRASI OTOMATIS GOOGLE SHEETS VIA FETCH API
+   BAGIAN 3: INTEGRASI OTOMATIS GOOGLE SHEETS VIA FETCH API (MODIFIED)
    ========================================================================== */
 
-// TARUH URL WEB APP OM YANG DI-COPY DARI LANGKAH 3 DI SINI:
-const URL_GOOGLE_SHEET = "https://script.google.com/macros/s/AKfycbzbz9r75Jkg9Kd2geoNRWzXp2IAzJC47Mh7gZsPMDXF7MvGL_JM6StX7PocTC2yLE3WLg/exec";
+// URL BARU BERDASARKAN PENERAPAN APPS SCRIPT ANDA
+const URL_GOOGLE_SHEET = "https://script.google.com/macros/s/AKfycbyRVV5no2gkjEGvfnaBcrOQ5PfnZnffcldQ0naEThjKD8Z0N15XUkAzRxPMfC4IJWGNfg/exec";
+
+// Menyediakan variabel global penampung data agar bisa dibaca fungsi PrayTimes di atas
+window.dataMasjidGlobal = {};
 
 function muatDataDariGoogleSheet() {
     fetch(URL_GOOGLE_SHEET)
         .then(response => response.json())
         .then(dataMasjid => {
             console.log("Data berhasil dimuat dari Google Sheet:", dataMasjid);
+            
+            // Simpan data ke lingkup global window agar terbaca engine clock
+            window.dataMasjidGlobal = dataMasjid;
 
             // Injeksi Petugas Jumat
             if(document.getElementById('tanggalJumat')) document.getElementById('tanggalJumat').innerText = dataMasjid.tanggalJumat || '-';
@@ -200,27 +208,4 @@ function muatDataDariGoogleSheet() {
                 index = 1;
 
                 // Bersihkan interval lama jika ada sebelum membuat yang baru
-                if (window.intervalInfoMasjid) clearInterval(window.intervalInfoMasjid);
-
-                window.intervalInfoMasjid = setInterval(() => {
-                    container.classList.remove('show');
-                    setTimeout(() => {
-                        container.innerText = infoList[index];
-                        container.classList.add('show');
-                        index = (index + 1) % infoList.length;
-                    }, 3000);
-                }, 36000);
-            }
-        })
-        .catch(error => {
-            console.error("Gagal mengambil data dari Google Sheet, menggunakan data lokal / kosong:", error);
-        });
-}
-
-// Jalankan fungsi saat web dibuka
-window.addEventListener('load', () => {
-    muatDataDariGoogleSheet();
-    
-    // Cek data baru secara otomatis setiap 5 menit (300000 ms) tanpa perlu refresh browser
-    setInterval(muatDataDariGoogleSheet, 300000);
-});
+                if (window.intervalInfoMasjid)
