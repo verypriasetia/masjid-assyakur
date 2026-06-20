@@ -50,17 +50,17 @@ function triggerAlarm() {
 }
 
 /* ==========================================================================
-   BAGIAN 2: ENGINE REFRESH CLOCK & COUNTDOWN (SETIAP 1 DETIK) - HIDDEN JADWAL PRAYER FIXED
+   BAGIAN 2: ENGINE REFRESH CLOCK & COUNTDOWN (SETIAP 1 DETIK) - HIDDEN TARGET FIXED
    ========================================================================== */
 setInterval(() => {
     const sekarang = new Date();
     
     // 1. Update Jam Utama di Rapat Bawah
     let jam = String(sekarang.getHours()).padStart(2, '0');
-    let Menlo = String(sekarang.getMinutes()).padStart(2, '0');
+    let menit = String(sekarang.getMinutes()).padStart(2, '0');
     let detik = String(sekarang.getSeconds()).padStart(2, '0');
     if (document.getElementById('clock')) {
-        document.getElementById('clock').innerText = `${jam}:${Menlo}:${detik}`;
+        document.getElementById('clock').innerText = `${jam}:${menit}:${detik}`;
     }
 
     // 2. Hitung Waktu Sholat Mendatang
@@ -76,7 +76,7 @@ setInterval(() => {
     let sholatActive = null;
     let waktuSekarangDetik = (sekarang.getHours() * 3600) + (sekarang.getMinutes() * 60) + sekarang.getSeconds();
 
-    // PERBAIKAN LOGIKA: Berikan toleransi agar jadwal tidak langsung melompat saat adzan tiba
+    // Logika toleransi agar jadwal tidak langsung melompat saat adzan tiba
     for (let i = 0; i < daftarSholat.length; i++) {
         let tParts = daftarSholat[i].waktu.split(':');
         let targetDetik = (parseInt(tParts[0]) * 3600) + (parseInt(tParts[1]) * 60);
@@ -87,7 +87,6 @@ setInterval(() => {
         }
         let batasIqamahDetik = mIqamahConfig * 60;
 
-        // Jadwal sholat tetap dipertahankan aktif sampai waktu adzan + durasi iqamah selesai melewati waktu sekarang
         if (targetDetik + batasIqamahDetik > waktuSekarangDetik) {
             sholatActive = { 
                 nama: daftarSholat[i].nama, 
@@ -100,7 +99,6 @@ setInterval(() => {
         }
     }
 
-    // Lewat Isya -> Target Subuh Besok
     if (!sholatActive) {
         let tParts = daftarSholat[0].waktu.split(':');
         sholatActive = { 
@@ -121,14 +119,15 @@ setInterval(() => {
 
     if (elWaktu) elWaktu.innerText = sholatActive.waktuStr;
 
-    // 3. Logika Transisi Adzan & Menunggu Iqamah (FIXED)
+    // 3. Logika Transisi Adzan & Menunggu Iqamah
     if (sisaDetik <= 0 && !sholatActive.isBesok) {
-        if (sisaDetik === 0) triggerAlarm(); // Bip tepat waktu adzan masuk
+        if (sisaDetik === 0) triggerAlarm(); 
 
-        // SEMBUNYIKAN WAKTU SHOLAT saat masuk mode Iqamah
-        if (elJadwalContainer) {
-            elJadwalContainer.style.display = 'none';
-        }
+        // SEMBUNYIKAN DAFTAR JADWAL SHOLAT
+        if (elJadwalContainer) elJadwalContainer.style.display = 'none';
+
+        // PERBAIKAN: Sembunyikan jam sholat target (.next-prayer-time) saat iqamah
+        if (elWaktu) elWaktu.style.display = 'none';
 
         if (elLabel) {
             elLabel.innerHTML = 'MENUNGGU IQAMAH';
@@ -144,12 +143,13 @@ setInterval(() => {
             elCountdown.style.color = '#ef4444';
         }
 
-        if (sisaIqamah === 0) triggerAlarm(); // Bip waktu iqamah habis
+        if (sisaIqamah === 0) triggerAlarm(); 
     } else {
-        // Mode Normal Menuju Adzan - TAMPILKAN KEMBALI WAKTU SHOLAT
-        if (elJadwalContainer) {
-            elJadwalContainer.style.display = 'block'; // atau 'grid' / 'flex' mengikuti struktur CSS asli
-        }
+        // Mode Normal Menuju Adzan - TAMPILKAN KEMBALI
+        if (elJadwalContainer) elJadwalContainer.style.display = 'block';
+        
+        // Tampilkan kembali jam target sholat saat mode normal
+        if (elWaktu) elWaktu.style.display = 'inline-block'; 
 
         if (elLabel) {
             elLabel.innerHTML = `WAKTU SHOLAT <span id="nextPrayerName">${sholatActive.isBesok ? 'SUBUH (BESOK)' : sholatActive.nama}</span>`;
@@ -174,7 +174,6 @@ setInterval(() => {
    BAGIAN 5: INTEGRASI OTOMATIS GOOGLE SHEETS VIA FETCH API
    ========================================================================== */
 
-// TARUH URL WEB APP OM YANG DI-COPY DARI LANGKAH 3 DI SINI:
 const URL_GOOGLE_SHEET = "https://script.google.com/macros/s/AKfycbzbz9r75Jkg9Kd2geoNRWzXp2IAzJC47Mh7gZsPMDXF7MvGL_JM6StX7PocTC2yLE3WLg/exec";
 
 function muatDataDariGoogleSheet() {
@@ -183,33 +182,27 @@ function muatDataDariGoogleSheet() {
         .then(dataMasjid => {
             console.log("Data berhasil dimuat dari Google Sheet:", dataMasjid);
 
-            // Injeksi Petugas Jumat
             if(document.getElementById('tanggalJumat')) document.getElementById('tanggalJumat').innerText = dataMasjid.tanggalJumat || '-';
             if(document.getElementById('khatib')) document.getElementById('khatib').innerText = dataMasjid.khatib || '-';
             if(document.getElementById('imam')) document.getElementById('imam').innerText = dataMasjid.imam || '-';
             if(document.getElementById('muadzin')) document.getElementById('muadzin').innerText = dataMasjid.muadzin || '-';
             
-            // Injeksi Saldo Keuangan
             if(document.getElementById('saldoAwal')) document.getElementById('saldoAwal').innerText = "Rp " + (dataMasjid.saldoAwal || '0');
             if(document.getElementById('pemasukan')) document.getElementById('pemasukan').innerText = "Rp " + (dataMasjid.pemasukan || '0');
             if(document.getElementById('pengeluaran')) document.getElementById('pengeluaran').innerText = "Rp " + (dataMasjid.pengeluaran || '0');
             if(document.getElementById('totalSaldo')) document.getElementById('totalSaldo').innerText = "Rp " + (dataMasjid.totalSaldo || '0');
 
-            // Injeksi Running Text Footer
             if(document.getElementById('runText1')) document.getElementById('runText1').innerText = dataMasjid.runningText || '';
             if(document.getElementById('runText2')) document.getElementById('runText2').innerText = dataMasjid.runningText || '';
 
-            // Injeksi Slide Informasi Tengah secara dinamis
             const container = document.getElementById('infoUpdateContent');
             if (container && dataMasjid.infoUpdate && dataMasjid.infoUpdate.length > 0) {
                 const infoList = dataMasjid.infoUpdate;
                 let index = 0;
                 
-                // Set isi pertama
                 container.innerText = infoList[0];
                 index = 1;
 
-                // Bersihkan interval lama jika ada sebelum membuat yang baru
                 if (window.intervalInfoMasjid) clearInterval(window.intervalInfoMasjid);
 
                 window.intervalInfoMasjid = setInterval(() => {
@@ -223,14 +216,11 @@ function muatDataDariGoogleSheet() {
             }
         })
         .catch(error => {
-            console.error("Gagal mengambil data dari Google Sheet, menggunakan data lokal / kosong:", error);
+            console.error("Gagal mengambil data dari Google Sheet:", error);
         });
 }
 
-// Jalankan fungsi saat web dibuka
 window.addEventListener('load', () => {
     muatDataDariGoogleSheet();
-    
-    // Cek data baru secara otomatis setiap 5 menit (300000 ms) tanpa perlu refresh browser
     setInterval(muatDataDariGoogleSheet, 300000);
 });
