@@ -294,6 +294,13 @@ main {
     text-transform: uppercase;
     letter-spacing: 0.04vw;
     margin-bottom: 0.8vh;
+    
+    /* Efek Outline Hitam Tebal Berkeliling */
+    text-shadow: 0.15vw 0.15vw 0vw #000000, 
+                -0.15vw -0.15vw 0vw #000000, 
+                 0.15vw -0.15vw 0vw #000000, 
+                -0.15vw 0.15vw 0vw #000000,
+                 0vw 0.25vh 0.4vw #000000;
 }
 .next-prayer-time {
     font-family: 'Times New Roman', Times, serif;
@@ -424,4 +431,9 @@ footer {
 @keyframes blinkGreenAni {
     0% { color: #4ade80; text-shadow: 0 0 0.8vw rgba(74, 222, 128, 0.5); }
     100% { color: #16a34a; text-shadow: 0 0 0.15vw rgba(22, 163, 74, 0.2); }
+}
+
+/* Utility Mode Iqamah untuk Kontrol Warna via Class Javascript */
+.next-prayer-label.iqamah-mode {
+    color: #ef4444 !important;
 }
