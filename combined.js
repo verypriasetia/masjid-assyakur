@@ -55,7 +55,7 @@ function triggerAlarm() {
 setInterval(() => {
     const sekarang = new Date();
     
-    // 1. Update Jam Utama di Rapat Bawah
+    /* 1. Update Jam Utama di Rapat Bawah */
     let jam = String(sekarang.getHours()).padStart(2, '0');
     let menit = String(sekarang.getMinutes()).padStart(2, '0');
     let detik = String(sekarang.getSeconds()).padStart(2, '0');
@@ -63,7 +63,7 @@ setInterval(() => {
         document.getElementById('clock').innerText = `${jam}:${menit}:${detik}`;
     }
 
-    // 2. Hitung Waktu Sholat Mendatang
+    /* 2. Hitung Waktu Sholat Mendatang */
     const times = pt.getTimes(sekarang, [lat, lng], timezone);
     const daftarSholat = [
         { nama: 'SUBUH', waktu: times.fajr },
@@ -118,7 +118,7 @@ setInterval(() => {
 
     if (elWaktu) elWaktu.innerText = sholatActive.waktuStr;
 
-    // 3. Logika Transisi Adzan & Menunggu Iqamah
+    /* 3. Logika Transisi Adzan & Menunggu Iqamah */
     if (sisaDetik <= 0 && !sholatActive.isBesok) {
         if (sisaDetik === 0) triggerAlarm(); 
 
@@ -130,7 +130,7 @@ setInterval(() => {
 
         if (elLabel) {
             elLabel.innerHTML = 'MENUNGGU IQAMAH';
-            elLabel.style.color = '#ef4444';
+            elLabel.classList.add('iqamah-mode'); /* Memakai class CSS agar inline-style tidak merusak outline shadow */
         }
         
         let sisaIqamah = sholatActive.batasIqamahDetik + sisaDetik;
@@ -150,7 +150,7 @@ setInterval(() => {
 
         if (elLabel) {
             elLabel.innerHTML = `WAKTU SHOLAT <span id="nextPrayerName">${sholatActive.isBesok ? 'SUBUH (BESOK)' : sholatActive.nama}</span>`;
-            elLabel.style.color = '#ffcc00';
+            elLabel.classList.remove('iqamah-mode'); /* Kembalikan kontrol warna ke warna dasar di file CSS */
         }
 
         let jamSisa = String(Math.floor(sisaDetik / 3600)).padStart(2, '0');
