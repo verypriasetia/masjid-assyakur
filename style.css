@@ -1,0 +1,459 @@
+/* ==========================================================================
+   1. REGISTRASI FONT DOT-MATRIX LOKAL
+   ========================================================================== */
+@font-face {
+    font-family: 'Robotron';
+    src: url('robotronfontelit.otf') format('truetype'),
+         url('robotronfontelit.otf') format('otf');
+    font-weight: normal;
+    font-style: normal;
+}
+
+/* ==========================================================================
+   2. GLOBAL RESET & LAYOUT TV MONITOR SYSTEM
+   ========================================================================== */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+html {
+    font-size: 1.0vw; /* Kunci Utama Skala Global Berbasis Lebar Layar TV */
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: url('background.jpg') no-repeat center center fixed;
+    background-size: 100% 100%;
+    color: #ffffff;
+    height: 100vh;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    text-shadow: 0.15vw 0.15vw 0.4vw rgba(0, 0, 0, 0.9); /* Skala tebal teks shadow */
+}
+
+/* ==========================================================================
+   3. SUSUN ATUR HEADER UTAMA (Tinggi 15% Mutlak)
+   ========================================================================== */
+header {
+    height: 15vh;
+    display: flex;
+    align-items: center;
+    background: rgba(0, 0, 0, 0.8);
+    padding: 0 1.5vw; /* Spasi horizontal berskala */
+    border-bottom: 0.25vh solid #00ffcc; /* Ketebalan garis berskala tinggi */
+}
+.logo-container {
+    height: 85%;
+    display: flex;
+    align-items: center;
+    margin-top: 0.5vh;
+    margin-left: 0.3vw;
+}
+.logo-container img {
+    height: 100%;
+    width: auto;
+}
+.title-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    margin-left: 1.2vw;
+}
+.title-container h1 {
+    font-size: 2.3rem;
+    font-weight: 800;
+    color: #00ffcc;
+    line-height: 1.1;
+    margin-bottom: 0.2vh;
+}
+.title-container h2 {
+    font-size: 1.15rem;
+    color: #ffffff;
+    font-weight: 600;
+}
+.title-container h3 {
+    font-size: 0.95rem;
+    color: #cbd5e1;
+    font-weight: 400;
+}
+
+/* ==========================================================================
+   4. DISTRIBUSI KANDUNGAN UTAMA (Tinggi Sisa Layar 73%)
+   ========================================================================== */
+main {
+    display: flex;
+    flex: 1;
+    height: 73vh;
+    padding: 1.5vh 1.5vw; /* Jarak luar konten berskala penuh */
+    gap: 1.2vw; /* Jarak renggang antar kolom berskala */
+    align-items: stretch;
+}
+
+/* Lebar Sektor Berbasis Persentase Mutlak */
+.left-column {
+    width: 30%; 
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+.center-column {
+    width: 45%; 
+    display: flex;
+    flex-direction: column;
+}
+.right-column {
+    width: 20%; 
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+/* Kerangka Kotak Informasi (Card Berskala) */
+.card {
+    background: rgba(10, 25, 20, 0.85);
+    border-radius: 0.8vw; /* Kelengkukan boks berskala */
+    padding: 1.5vh 1.2vw; /* Spasi dalam boks berskala */
+    border: 0.08vw solid rgba(0, 255, 204, 0.2); /* Garis tepi berskala tipis */
+    box-shadow: 0 0.5vh 1.5vh rgba(0, 0, 0, 0.8);
+}
+.card-title {
+    font-size: 1.15rem;
+    color: #00ffcc;
+    border-bottom: 0.15vh dashed #00ffcc;
+    padding-bottom: 0.4vh;
+    margin-bottom: 0.8vh;
+    text-transform: uppercase;
+    font-weight: 700;
+    letter-spacing: 0.04vw;
+}
+
+/* ==========================================================================
+   5. DETAIL SEKTOR KIRI (Tinggi Mutlak Per Item = 22.5%)
+   ========================================================================== */
+.jumat-card, .kas-card, .rek-card {
+    height: 22.5vh;
+    overflow: hidden; 
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+}
+
+/* Tabel Sholat Jumat */
+.sub-date {
+    font-size: 0.85rem; 
+    color: #ffcc00;
+    margin-top: -0.2vh;
+    margin-bottom: 0.4vh;
+    font-weight: 600;
+    text-align: center;
+}
+.info-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+.info-table td {
+    padding: 0.35vh 0; /* Spasi baris vertikal berskala tinggi layar */
+    font-size: 0.95rem; 
+    vertical-align: middle;
+}
+.jumat-table td.label {
+    width: 4.5vw; /* Lebar kolom label berskala */
+    color: #e2e8f0;
+}
+.jumat-table td.separator {
+    width: 1.2vw;
+    text-align: center;
+    color: #00ffcc;
+}
+.jumat-table td.value {
+    color: #ffffff;
+    font-weight: 600;
+}
+
+/* Penjajaran Kas Keuangan */
+.kas-table {
+    margin-top: 0.2vh;
+}
+.kas-table td.label-left {
+    text-align: left;
+    color: #e2e8f0;
+}
+.kas-table td.value-right {
+    text-align: right;
+    font-family: monospace;
+    font-weight: bold;
+    font-size: 1.0rem; 
+    color: #ffffff;
+}
+.saldo-row {
+    border-top: 0.1vh dashed rgba(255, 255, 255, 0.3);
+}
+.highlight-saldo-label {
+    color: #ef4444 !important; 
+    font-weight: 800 !important;
+    padding-top: 0.6vh !important;
+}
+.highlight-saldo-val {
+    color: #22c55e !important; 
+    font-weight: 800 !important;
+    font-size: 1.15rem !important; 
+    padding-top: 0.6vh !important;
+}
+
+/* Rekening Box */
+.rek-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: calc(100% - 2.5vh);
+}
+.rek-bank {
+    font-size: 1.1rem;
+    color: #ffcc00;
+    font-weight: bold;
+    margin-bottom: 0.2vh;
+}
+.rek-number {
+    font-size: 1.35rem;
+    font-family: monospace;
+    color: #ffffff;
+    background: rgba(0, 0, 0, 0.4);
+    padding: 0.2vh 1.0vw;
+    border-radius: 0.4vw;
+    letter-spacing: 0.08vw;
+    border: 0.08vw solid rgba(0, 255, 204, 0.3);
+}
+.rek-owner {
+    font-size: 0.85rem;
+    color: #cbd5e1;
+    margin-top: 0.4vh;
+}
+
+/* ==========================================================================
+   6. DETAIL SEKTOR TENGAH (Papan Informasi Masjid)
+   ========================================================================== */
+.info-board-card {
+    height: 100%; 
+    display: flex;
+    flex-direction: column;
+}
+.info-board-title {
+    font-size: 1.4rem;
+    text-align: center;
+    font-weight: 800;
+    padding-bottom: 0.8vh;
+    border-bottom: 0.15vh dashed rgba(0, 255, 204, 0.4);
+    margin-bottom: 2.0vh;
+}
+.info-slider-container {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 0.8vw;
+}
+.info-fade-text {
+    font-size: 1.55rem;
+    line-height: 1.5;
+    text-align: center;
+    font-weight: 600;
+    color: #ffffff;
+    opacity: 0;
+    transition: opacity 3s ease-in-out; 
+}
+.info-fade-text.show {
+    opacity: 1;
+}
+
+/* ==========================================================================
+   7. DETAIL SEKTOR KANAN (Tampilan Waktu Sholat Mendatang & Jam Sekarang)
+   ========================================================================== */
+.next-prayer-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start; 
+}
+.next-prayer-card {
+    background: transparent;
+    border: none;
+    border-radius: 0;
+    padding: 1.0vh 0;
+    text-align: center;
+    box-shadow: none;
+}
+.next-prayer-label {
+    font-family: 'Times New Roman', Times, serif;
+    font-size: 1.25rem;
+    font-weight: 800;
+    color: #ffcc00; 
+    text-transform: uppercase;
+    letter-spacing: 0.04vw;
+    margin-bottom: 0.8vh;
+    
+    /* Efek Outline Hitam Tebal Berkeliling */
+    text-shadow: 0.15vw 0.15vw 0vw #000000, 
+                -0.15vw -0.15vw 0vw #000000, 
+                 0.15vw -0.15vw 0vw #000000, 
+                -0.15vw 0.15vw 0vw #000000,
+                 0vw 0.25vh 0.4vw #000000;
+}
+.next-prayer-time {
+    font-family: 'Times New Roman', Times, serif;
+    font-size: 3.45rem; 
+    font-weight: 900;    
+    color: #ffffff;
+    line-height: 1.1;
+    margin-bottom: 1.2vh;
+    letter-spacing: -0.08vw;
+    text-align: center;
+    display: block;
+    text-shadow: 0.15vw 0.15vw 0vw #000000, 
+                -0.15vw -0.15vw 0vw #000000, 
+                 0.15vw -0.15vw 0vw #000000, 
+                -0.15vw 0.15vw 0vw #000000,
+                 0vw 0.25vh 0.5vh rgba(0, 0, 0, 0.8);
+}
+.next-prayer-countdown {
+    font-family: 'Robotron', monospace;
+    font-size: 2.3rem;
+    color: #ef4444; 
+    background: rgba(0, 0, 0, 0.7); 
+    padding: 0.6vh 1.0vw;
+    border-radius: 0.6vw;
+    border: 0.08vw solid rgba(239, 68, 68, 0.4);
+    display: inline-block;
+    min-width: 85%;
+    box-shadow: 0 0.4vh 1.0vh rgba(0, 0, 0, 0.6);
+}
+
+/* Sektor Jam & Penanggalan (Rapat Bawah) */
+.live-clock-card {
+    background: rgba(0, 0, 0, 0.75);
+    border-radius: 12px;
+    padding: 1.5vh 1.0vw;
+    text-align: center;
+    border-top: 0.4vh solid #ffcc00;
+    margin-top: auto; 
+    box-shadow: 0 -0.4vh 1.5vh rgba(0, 0, 0, 0.5);
+}
+.clock-label {
+    font-family: 'Times New Roman', Times, serif;
+    color: #ffffff;
+    font-size: 1.25rem;
+    margin-bottom: 0.4vh;
+    text-transform: uppercase;
+    font-weight: bold;
+    letter-spacing: 0.04vw;
+}
+.digital-clock-main {
+    font-family: 'Times New Roman', Times, serif;
+    font-size: 3.6rem; 
+    font-weight: 900;   
+    color: #ffffff !important;
+    line-height: 1.1;
+    margin-bottom: 0.6vh;
+    letter-spacing: -0.08vw;
+    text-shadow: 0.2vw 0.2vw 0.4vw rgba(0, 0, 0, 0.9);
+}
+.date-masehi {
+    font-size: 1.05rem;
+    color: #ffffff;
+    font-weight: 600;
+}
+.date-hijriah {
+    font-size: 1.15rem;
+    color: #00ffcc;
+    font-weight: bold;
+    margin-top: 0.3vh;
+}
+
+/* ==========================================================================
+   8. FOOTER RUNNING TEXT (Tinggi Mutlak 12%)
+   ========================================================================== */
+footer {
+    height: 12vh;
+    background: #000000;
+    border-top: 0.3vh solid #ffcc00;
+    display: flex;
+    align-items: center;
+    overflow: hidden;
+}
+.marquee-label {
+    background: #ffcc00;
+    color: #000000;
+    font-weight: 900;
+    font-size: 1.2rem;
+    padding: 0 1.5vw;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10;
+    box-shadow: 0.4vw 0 1.2vw rgba(0, 0, 0, 0.5);
+}
+.marquee-container {
+    flex: 1;
+    overflow: hidden;
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+.marquee-content {
+    font-family: 'Robotron', monospace;
+    display: inline-block;
+    white-space: nowrap;
+    padding-left: 100%;
+    animation: marqueeAnimation 150s linear infinite;
+    font-size: 2.8rem;
+    font-weight: 600;
+    color: #ef4444;
+    letter-spacing: 0.08vw;
+    text-shadow: 0 0 0.6vw rgba(239, 68, 68, 0.6), 
+                 0 0 1.2vw rgba(239, 68, 68, 0.3),
+                 0.15vw 0.15vw 0.3vw rgba(0, 0, 0, 0.9);
+}
+@keyframes marqueeAnimation {
+    0% { transform: translate3d(0, 0, 0); }
+    100% { transform: translate3d(-100%, 0, 0); }
+}
+
+/* ==========================================================================
+   9. INDIKATOR BERKEDIP (Blink Effects)
+   ========================================================================== */
+.blink-green {
+    animation: blinkGreenAni 1.5s infinite alternate;
+}
+@keyframes blinkGreenAni {
+    0% { color: #4ade80; text-shadow: 0 0 0.8vw rgba(74, 222, 128, 0.5); }
+    100% { color: #16a34a; text-shadow: 0 0 0.15vw rgba(22, 163, 74, 0.2); }
+}
+
+/* Utility Mode Iqamah untuk Kontrol Warna via Class Javascript */
+.next-prayer-label.iqamah-mode {
+    color: #ef4444 !important;
+}
+
+/* ==========================================================================
+   10. FALLBACK MODE & CONNECTION ERROR INDICATOR
+   ========================================================================== */
+.blink-red-msg {
+    color: #ef4444;
+    font-size: 1.1rem;
+    font-weight: 700;
+    text-align: center;
+    padding-top: 1vh;
+    border-top: 0.15vh dashed rgba(239, 68, 68, 0.4);
+    margin-top: auto;
+    animation: blinkRedAni 1.5s infinite alternate;
+    text-shadow: 0 0 0.6vw rgba(239, 68, 68, 0.5);
+}
+
+@keyframes blinkRedAni {
+    0% { opacity: 1; color: #ef4444; text-shadow: 0 0 0.8vw rgba(239, 68, 68, 0.6); }
+    100% { opacity: 0.4; color: #b91c1c; text-shadow: 0 0 0.2vw rgba(185, 28, 28, 0.2); }
+}
