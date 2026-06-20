@@ -1,47 +1,9 @@
 /* ==========================================================================
-   PENGATURAN MODE OFFLINE MANDIRI & HYBRID GOOGLE SHEET
+   FUNGSI HYBRID GOOGLE SHEET (DENGAN PENANGANAN OFFLINE KHUSUS)
    ========================================================================== */
 
-// 1. Fungsi Utama Mengambil Jadwal Sholat dari Database Lokal (100% Offline)
-function muatJadwalSholatLokal() {
-    // Ambil tanggal hari ini dengan format YYYY-MM-DD sesuai zona waktu lokal
-    const sekarang = new Date();
-    const tahun = sekarang.getFullYear();
-    const bulan = String(sekarang.getMonth() + 1).padStart(2, '0');
-    const tanggal = String(sekarang.getDate()).padStart(2, '0');
-    const stringTanggal = `${tahun}-${bulan}-${tanggal}`;
-
-    // Cari di dalam DATABASE_JADWAL_TAHUNAN (dari file jadwal_db.js)
-    if (typeof DATABASE_JADWAL_TAHUNAN !== 'undefined' && DATABASE_JADWAL_TAHUNAN[stringTanggal]) {
-        const jadwalHariIni = DATABASE_JADWAL_TAHUNAN[stringTanggal];
-        
-        // Perbarui objek global penampung jadwal sholat aplikasi
-        jadwalSholatHariIni = {
-            imsak: jadwalHariIni.imsak,
-            fajr: jadwalHariIni.fajr,
-            dhuhr: jadwalHariIni.dhuhr,
-            asr: jadwalHariIni.asr,
-            sunset: jadwalHariIni.magrib, // mapping magrib ke sunset jika diperlukan engine
-            isha: jadwalHariIni.isya
-        };
-
-        // Inject langsung ke elemen UI halaman index.html jika elemennya ada
-        if(document.getElementById('time-imsak')) document.getElementById('time-imsak').innerText = dataJadwal.imsak;
-        if(document.getElementById('time-subuh')) document.getElementById('time-subuh').innerText = jadwalHariIni.fajr;
-        if(document.getElementById('time-dzuhur')) document.getElementById('time-dzuhur').innerText = jadwalHariIni.dhuhr;
-        if(document.getElementById('time-ashar')) document.getElementById('time-ashar').innerText = jadwalHariIni.asr;
-        if(document.getElementById('time-maghrib')) document.getElementById('time-maghrib').innerText = jadwalHariIni.magrib;
-        if(document.getElementById('time-isya')) document.getElementById('time-isya').innerText = jadwalHariIni.isya;
-        
-        console.log(`[OFFLINE] Jadwal sholat hari ini (${stringTanggal}) berhasil dimuat dari database lokal.`);
-    } else {
-        console.warn(`[WARN] Jadwal untuk tanggal ${stringTanggal} tidak ditemukan di database lokal. Menggunakan nilai default bawaan.`);
-    }
-}
-
-// 2. Fungsi Hybrid Ambil Data Informasi & Petugas dari Google Sheet (Online dengan Fallback Aman)
 function sinkronisasiDataMadingSheet() {
-    // Ganti URL ini dengan URL Apps Script Web App Google Sheet Anda
+    // URL Apps Script Web App Google Sheet Anda
     const URL_APPS_SCRIPT = "CONTOH_URL_WEB_APP_APPS_SCRIPT_ANDA"; 
 
     console.log("[HYBRID] Mencoba menyinkronkan data informasi dari Google Sheet...");
@@ -49,9 +11,9 @@ function sinkronisasiDataMadingSheet() {
     fetch(URL_APPS_SCRIPT)
         .then(response => response.json())
         .then(res => {
-            console.log("[HYBRID] Koneksi sukses. Memperbarui informasi mading dari Google Sheet.");
+            console.log("[HYBRID] Koneksi sukses. Memperbarui informasi dari Google Sheet.");
 
-            // A. Perbarui data konfigurasi Jeda Iqamah secara dinamis jika ada di Sheet
+            // 1. Perbarui data konfigurasi Jeda Iqamah
             if (res.jedaIqamah) {
                 dataMasjidGlobal.jedaIqamah = {
                     "SUBUH": res.jedaIqamah.SUBUH || 10,
@@ -62,7 +24,7 @@ function sinkronisasiDataMadingSheet() {
                 };
             }
 
-            // B. Perbarui Petugas Sholat Jumat & Petugas Harian jika ada di UI
+            // 2. Tampilkan Data Petugas Sholat Jumat
             if (res.petugasJumat) {
                 if(document.getElementById('tanggalJumat')) document.getElementById('tanggalJumat').innerText = res.petugasJumat.tanggal || "-";
                 if(document.getElementById('khatib')) document.getElementById('khatib').innerText = res.petugasJumat.khatib || "-";
@@ -70,7 +32,22 @@ function sinkronisasiDataMadingSheet() {
                 if(document.getElementById('muadzinJumat')) document.getElementById('muadzinJumat').innerText = res.petugasJumat.muadzin || "-";
             }
 
-            // C. Sistem Slide Transisi Teks Informasi Tengah / Running Text Marquee
+            // 3. Tampilkan Data Kas dan Saldo Keuangan Masjid
+            if (res.keuangan) {
+                if(document.getElementById('saldoKas')) document.getElementById('saldoKas').innerText = res.keuangan.saldo || "-";
+                if(document.getElementById('pemasukanKas')) document.getElementById('pemasukanKas').innerText = res.keuangan.pemasukan || "-";
+                if(document.getElementById('pengeluaranKas')) document.getElementById('pengeluaranKas').innerText = res.keuangan.pengeluaran || "-";
+            }
+
+            // 4. Perbarui Teks Berjalan Bawah (Running Text Marquee) saat Online
+            if (res.runningText) {
+                const marqueeElement = document.getElementById('runningTextContent');
+                if (marqueeElement) {
+                    marqueeElement.innerText = res.runningText;
+                }
+            }
+
+            // 5. Sistem Slide Transisi Papan Teks Informasi Tengah
             const container = document.getElementById('infoUpdateContent');
             if (container && res.infoUpdate && res.infoUpdate.length > 0) {
                 const infoList = res.infoUpdate;
@@ -92,23 +69,30 @@ function sinkronisasiDataMadingSheet() {
             }
         })
         .catch(error => {
-            // JIKA INTERNET PUTUS ATAU GOOGLE SHEET ERROR:
-            // Sistem diam, tidak crash, dan tetap menggunakan nilai default/teks yang sudah ada di HTML.
-            console.error("[OFFLINE MODE] Gagal sinkronisasi Google Sheet (Offline/RTO). Menggunakan data default aman:", error);
+            // ==================================================================
+            // KETIKA KONEKSI INTERNET TERPUTUS (MODE OFFLINE)
+            // ==================================================================
+            console.error("[OFFLINE MODE] Koneksi internet terputus. Mengaktifkan sistem proteksi lokal:", error);
+
+            // A. Pasang teks peringatan pada Running Text bawah
+            const marqueeElement = document.getElementById('runningTextContent');
+            if (marqueeElement) {
+                marqueeElement.innerHTML = "<span style='color: #ff4d4d; font-weight: bold;'>⚠️ Mode Offline, Koneksi internet sedang terputus.</span>";
+            }
+
+            // B. Kosongkan Petugas Jumat agar tidak menampilkan data minggu lalu
+            if(document.getElementById('tanggalJumat')) document.getElementById('tanggalJumat').innerText = "-";
+            if(document.getElementById('khatib')) document.getElementById('khatib').innerText = "-";
+            if(document.getElementById('imamJumat')) document.getElementById('imamJumat').innerText = "-";
+            if(document.getElementById('muadzinJumat')) document.getElementById('muadzinJumat').innerText = "-";
+
+            // C. Kosongkan Keuangan (Kas & Saldo) demi validasi data
+            if(document.getElementById('saldoKas')) document.getElementById('saldoKas').innerText = "-";
+            if(document.getElementById('pemasukanKas')) document.getElementById('pemasukanKas').innerText = "-";
+            if(document.getElementById('pengeluaranKas')) document.getElementById('pengeluaranKas').innerText = "-";
+
+            // D. Catatan untuk Papan Informasi Tengah:
+            // Sesuai request OmVery, teks informasi update TIDAK diubah atau direset. 
+            // Slider interval lama yang berisi info-info sebelumnya akan TETAP berputar di layar.
         });
 }
-
-// 3. Inisialisasi Pertama Kali Saat Aplikasi Dibuka di TV Monitor
-window.addEventListener('load', () => {
-    // Jalankan pemuatan jadwal sholat offline seketika
-    muatJadwalSholatLokal();
-    
-    // Jalankan sinkronisasi data pendukung dari internet
-    sinkronisasiDataMadingSheet();
-
-    // Perbarui jadwal offline setiap jam sekali untuk mengantisipasi pergantian hari (tengah malam)
-    setInterval(muatJadwalSholatLokal, 3600000);
-
-    // Coba hubungkan ulang ke cloud Google Sheet setiap 10 menit sekali untuk update mading
-    setInterval(sinkronisasiDataMadingSheet, 600000);
-});
