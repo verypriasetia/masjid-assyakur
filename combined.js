@@ -50,7 +50,7 @@ function triggerAlarm() {
 }
 
 /* ==========================================================================
-   BAGIAN 2: ENGINE REFRESH CLOCK & COUNTDOWN (SETIAP 1 DETIK) - HIDDEN TARGET FIXED
+   BAGIAN 2: ENGINE REFRESH CLOCK & COUNTDOWN (SETIAP 1 DETIK) - TOTAL HIDE FIX
    ========================================================================== */
 setInterval(() => {
     const sekarang = new Date();
@@ -76,7 +76,6 @@ setInterval(() => {
     let sholatActive = null;
     let waktuSekarangDetik = (sekarang.getHours() * 3600) + (sekarang.getMinutes() * 60) + sekarang.getSeconds();
 
-    // Logika toleransi agar jadwal tidak langsung melompat saat adzan tiba
     for (let i = 0; i < daftarSholat.length; i++) {
         let tParts = daftarSholat[i].waktu.split(':');
         let targetDetik = (parseInt(tParts[0]) * 3600) + (parseInt(tParts[1]) * 60);
@@ -113,7 +112,7 @@ setInterval(() => {
     let sisaDetik = sholatActive.targetDetik - waktuSekarangDetik;
 
     const elLabel = document.getElementById('nextPrayerLabel');
-    const elWaktu = document.getElementById('nextPrayerTime');
+    const elWaktu = document.getElementById('nextPrayerTime') || document.querySelector('.next-prayer-time');
     const elCountdown = document.getElementById('nextPrayerCountdown');
     const elJadwalContainer = document.querySelector('.prayer-times-container') || document.getElementById('jadwal-shalat');
 
@@ -123,11 +122,11 @@ setInterval(() => {
     if (sisaDetik <= 0 && !sholatActive.isBesok) {
         if (sisaDetik === 0) triggerAlarm(); 
 
-        // SEMBUNYIKAN DAFTAR JADWAL SHOLAT
-        if (elJadwalContainer) elJadwalContainer.style.display = 'none';
+        // 1. Sembunyikan Tabel Waktu Sholat Utama
+        if (elJadwalContainer) elJadwalContainer.style.setProperty('display', 'none', 'important');
 
-        // PERBAIKAN: Sembunyikan jam sholat target (.next-prayer-time) saat iqamah
-        if (elWaktu) elWaktu.style.display = 'none';
+        // 2. Sembunyikan teks target jam sholat (Cara Radikal Menggunakan !important)
+        if (elWaktu) elWaktu.style.setProperty('display', 'none', 'important');
 
         if (elLabel) {
             elLabel.innerHTML = 'MENUNGGU IQAMAH';
@@ -145,11 +144,9 @@ setInterval(() => {
 
         if (sisaIqamah === 0) triggerAlarm(); 
     } else {
-        // Mode Normal Menuju Adzan - TAMPILKAN KEMBALI
-        if (elJadwalContainer) elJadwalContainer.style.display = 'block';
-        
-        // Tampilkan kembali jam target sholat saat mode normal
-        if (elWaktu) elWaktu.style.display = 'inline-block'; 
+        // Mode Normal Menuju Adzan - Kembalikan Semua Tampilan
+        if (elJadwalContainer) elJadwalContainer.style.setProperty('display', 'block');
+        if (elWaktu) elWaktu.style.setProperty('display', 'inline-block'); 
 
         if (elLabel) {
             elLabel.innerHTML = `WAKTU SHOLAT <span id="nextPrayerName">${sholatActive.isBesok ? 'SUBUH (BESOK)' : sholatActive.nama}</span>`;
@@ -170,18 +167,12 @@ setInterval(() => {
 /* ==========================================================================
    BAGIAN 3: INJEKSI DATA KAS, PETUGAS & RUNNING TEXT
    ========================================================================== */
-/* ==========================================================================
-   BAGIAN 5: INTEGRASI OTOMATIS GOOGLE SHEETS VIA FETCH API
-   ========================================================================== */
-
 const URL_GOOGLE_SHEET = "https://script.google.com/macros/s/AKfycbzbz9r75Jkg9Kd2geoNRWzXp2IAzJC47Mh7gZsPMDXF7MvGL_JM6StX7PocTC2yLE3WLg/exec";
 
 function muatDataDariGoogleSheet() {
     fetch(URL_GOOGLE_SHEET)
         .then(response => response.json())
         .then(dataMasjid => {
-            console.log("Data berhasil dimuat dari Google Sheet:", dataMasjid);
-
             if(document.getElementById('tanggalJumat')) document.getElementById('tanggalJumat').innerText = dataMasjid.tanggalJumat || '-';
             if(document.getElementById('khatib')) document.getElementById('khatib').innerText = dataMasjid.khatib || '-';
             if(document.getElementById('imam')) document.getElementById('imam').innerText = dataMasjid.imam || '-';
