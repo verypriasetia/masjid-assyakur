@@ -1,225 +1,76 @@
 /* ==========================================================================
-   BAGIAN 1: ENGINE ENGINE UTAMA & DATABASE JADWAL SHOLAT GLOBAL
+   PENGATURAN MODE OFFLINE MANDIRI & HYBRID GOOGLE SHEET
    ========================================================================== */
 
-// Wadah default jadwal sholat sebelum data dari Sheet 2 berhasil dimuat
-let jadwalSholatHariIni = {
-    imsak: "04:44",
-    fajr: "04:54",
-    dhuhr: "12:18",
-    asr: "15:43",
-    sunset: "18:21",
-    isha: "19:35"
-};
-
-// Objek penampung konfigurasi jeda iqamah dari Apps Script (Sheet 1)
-let dataMasjidGlobal = {
-    jedaIqamah: {
-        "SUBUH": 10,
-        "DZUHUR": 10,
-        "ASHAR": 10,
-        "MAGHRIB": 10,
-        "ISYA": 10
-    }
-};
-
-// Sistem Alarm Beep (Berbunyi otomatis saat countdown menyentuh angka 0)
-const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-function playBeep() {
-    let osc = audioCtx.createOscillator();
-    let gain = audioCtx.createGain();
-    osc.connect(gain); gain.connect(audioCtx.destination);
-    osc.type = 'sine'; osc.frequency.setValueAtTime(1000, audioCtx.currentTime);
-    gain.gain.setValueAtTime(1, audioCtx.currentTime);
-    osc.start(); osc.stop(audioCtx.currentTime + 1);
-}
-function triggerAlarm() {
-    playBeep();
-    setTimeout(playBeep, 1500);
-    setTimeout(playBeep, 3000);
-}
-
-// Helper untuk mengubah tanggal komputer menjadi format Sheet 2 (Contoh: "20 Juni")
-function dapatkanKeyTanggalFormat(dateObj) {
-    const namaBulan = [
-        "Januari", "Februari", "Maret", "April", "Mei", "Juni", 
-        "Juli", "Agustus", "September", "Oktober", "November", "Desember"
-    ];
-    let tgl = String(dateObj.getDate()).padStart(2, '0');
-    let bln = namaBulan[dateObj.getMonth()];
-    return `${tgl} ${bln}`;
-}
-
-/* ==========================================================================
-   BAGIAN 2: ENGINE COUNTDOWN DETIK & TRANSISI ADZAN KE IQAMAH (Tiap 1 Detik)
-   ========================================================================== */
-setInterval(() => {
+// 1. Fungsi Utama Mengambil Jadwal Sholat dari Database Lokal (100% Offline)
+function muatJadwalSholatLokal() {
+    // Ambil tanggal hari ini dengan format YYYY-MM-DD sesuai zona waktu lokal
     const sekarang = new Date();
-    
-    /* 1. Perbarui Jam Digital Utama */
-    let jam = String(sekarang.getHours()).padStart(2, '0');
-    let menit = String(sekarang.getMinutes()).padStart(2, '0');
-    let detik = String(sekarang.getSeconds()).padStart(2, '0');
-    if (document.getElementById('clock')) {
-        document.getElementById('clock').innerText = `${jam}:${menit}:${detik}`;
-    }
+    const tahun = sekarang.getFullYear();
+    const bulan = String(sekarang.getMonth() + 1).padStart(2, '0');
+    const tanggal = String(sekarang.getDate()).padStart(2, '0');
+    const stringTanggal = `${tahun}-${bulan}-${tanggal}`;
 
-    /* 2. Pemetaan Target Waktu Adzan Berdasarkan Data Sinkronisasi */
-    const daftarSholat = [
-        { nama: 'SUBUH', waktu: jadwalSholatHariIni.fajr },
-        { nama: 'DZUHUR', waktu: jadwalSholatHariIni.dhuhr },
-        { nama: 'ASHAR', waktu: jadwalSholatHariIni.asr },
-        { nama: 'MAGHRIB', waktu: jadwalSholatHariIni.sunset },
-        { nama: 'ISYA', waktu: jadwalSholatHariIni.isha }
-    ];
-
-    let sholatActive = null;
-    let waktuSekarangDetik = (sekarang.getHours() * 3600) + (sekarang.getMinutes() * 60) + sekarang.getSeconds();
-
-    for (let i = 0; i < daftarSholat.length; i++) {
-        let tParts = daftarSholat[i].waktu.split(':');
-        let targetDetik = (parseInt(tParts[0]) * 3600) + (parseInt(tParts[1]) * 60);
+    // Cari di dalam DATABASE_JADWAL_TAHUNAN (dari file jadwal_db.js)
+    if (typeof DATABASE_JADWAL_TAHUNAN !== 'undefined' && DATABASE_JADWAL_TAHUNAN[stringTanggal]) {
+        const jadwalHariIni = DATABASE_JADWAL_TAHUNAN[stringTanggal];
         
-        // Ambil konfigurasi jeda iqamah per sholat
-        let mIqamahConfig = dataMasjidGlobal.jedaIqamah[daftarSholat[i].nama] || 10;
-        let batasIqamahDetik = mIqamahConfig * 60;
-
-        if (targetDetik + batasIqamahDetik > waktuSekarangDetik) {
-            sholatActive = { 
-                nama: daftarSholat[i].nama, 
-                waktuStr: daftarSholat[i].waktu, 
-                targetDetik: targetDetik, 
-                batasIqamahDetik: batasIqamahDetik,
-                isBesok: false 
-            };
-            break;
-        }
-    }
-
-    // Jika waktu Isya telah terlewati, target mundur ke Subuh esok hari
-    if (!sholatActive) {
-        let tParts = daftarSholat[0].waktu.split(':');
-        sholatActive = { 
-            nama: 'SUBUH', 
-            waktuStr: daftarSholat[0].waktu, 
-            targetDetik: (parseInt(tParts[0]) * 3600) + (parseInt(tParts[1]) * 60) + 86400, 
-            batasIqamahDetik: (dataMasjidGlobal.jedaIqamah["SUBUH"] || 10) * 60,
-            isBesok: true 
+        // Perbarui objek global penampung jadwal sholat aplikasi
+        jadwalSholatHariIni = {
+            imsak: jadwalHariIni.imsak,
+            fajr: jadwalHariIni.fajr,
+            dhuhr: jadwalHariIni.dhuhr,
+            asr: jadwalHariIni.asr,
+            sunset: jadwalHariIni.magrib, // mapping magrib ke sunset jika diperlukan engine
+            isha: jadwalHariIni.isya
         };
-    }
 
-    let sisaDetik = sholatActive.targetDetik - waktuSekarangDetik;
-
-    const elLabel = document.getElementById('nextPrayerLabel');
-    const elWaktu = document.getElementById('nextPrayerTime');
-    const elCountdown = document.getElementById('nextPrayerCountdown');
-    const elJadwalContainer = document.getElementById('jadwal-shalat') || document.querySelector('.prayer-times-container');
-
-    if (elWaktu) elWaktu.innerText = sholatActive.waktuStr;
-
-    /* 3. Pengkondisian Layar: Mode Menunggu Adzan vs Mode Menunggu Iqamah */
-    if (sisaDetik <= 0 && !sholatActive.isBesok) {
-        // Tepat saat adzan berkumandang
-        if (sisaDetik === 0) triggerAlarm(); 
-
-        // Sembunyikan daftar tabel waktu agar layar fokus ke hitung mundur Iqamah
-        if (elJadwalContainer) elJadwalContainer.style.setProperty('display', 'none', 'important');
-        if (elWaktu) elWaktu.style.setProperty('display', 'none', 'important');
-
-        if (elLabel) {
-            elLabel.innerHTML = 'MENUNGGU IQAMAH';
-            elLabel.classList.add('iqamah-mode');
-        }
+        // Inject langsung ke elemen UI halaman index.html jika elemennya ada
+        if(document.getElementById('time-imsak')) document.getElementById('time-imsak').innerText = dataJadwal.imsak;
+        if(document.getElementById('time-subuh')) document.getElementById('time-subuh').innerText = jadwalHariIni.fajr;
+        if(document.getElementById('time-dzuhur')) document.getElementById('time-dzuhur').innerText = jadwalHariIni.dhuhr;
+        if(document.getElementById('time-ashar')) document.getElementById('time-ashar').innerText = jadwalHariIni.asr;
+        if(document.getElementById('time-maghrib')) document.getElementById('time-maghrib').innerText = jadwalHariIni.magrib;
+        if(document.getElementById('time-isya')) document.getElementById('time-isya').innerText = jadwalHariIni.isya;
         
-        let sisaIqamah = sholatActive.batasIqamahDetik + sisaDetik;
-        let mIqamah = String(Math.floor(sisaIqamah / 60)).padStart(2, '0');
-        let sIqamah = String(sisaIqamah % 60).padStart(2, '0');
-        
-        if (elCountdown) {
-            elCountdown.innerText = `${mIqamah}:${sIqamah}`;
-            elCountdown.style.color = '#ef4444';
-        }
-
-        // Tepat saat waktu iqamah dimulai
-        if (sisaIqamah === 0) triggerAlarm(); 
+        console.log(`[OFFLINE] Jadwal sholat hari ini (${stringTanggal}) berhasil dimuat dari database lokal.`);
     } else {
-        // Kembalikan tampilan tabel waktu sholat harian
-        if (elJadwalContainer) elJadwalContainer.style.setProperty('display', 'block');
-        if (elWaktu) elWaktu.style.setProperty('display', 'inline-block'); 
-
-        if (elLabel) {
-            elLabel.innerHTML = `WAKTU SHOLAT <span id="nextPrayerName">${sholatActive.isBesok ? 'SUBUH (BESOK)' : sholatActive.nama}</span>`;
-            elLabel.classList.remove('iqamah-mode');
-        }
-
-        let jamSisa = String(Math.floor(sisaDetik / 3600)).padStart(2, '0');
-        let menitSisa = String(Math.floor((sisaDetik % 3600) / 60)).padStart(2, '0');
-        let detikSisa = String(sisaDetik % 60).padStart(2, '0');
-
-        if (elCountdown) {
-            elCountdown.innerText = `${jamSisa}:${menitSisa}:${detikSisa}`;
-            elCountdown.style.color = '#ef4444';
-        }
+        console.warn(`[WARN] Jadwal untuk tanggal ${stringTanggal} tidak ditemukan di database lokal. Menggunakan nilai default bawaan.`);
     }
-}, 1000);
+}
 
-/* ==========================================================================
-   BAGIAN 3: AMBIL DATA DUA SHEET (INFORMASI UMUM & LOOKUP JADWAL SHOLAT)
-   ========================================================================== */
-// PASTI KAN URL INI SESUAI DENGAN HASIL WEB APP DEPLOYMENT APPS SCRIPT ANDA
-const URL_GOOGLE_SHEET = "https://script.google.com/macros/s/AKfycbzbz9r75Jkg9Kd2geoNRWzXp2IAzJC47Mh7gZsPMDXF7MvGL_JM6StX7PocTC2yLE3WLg/exec";
+// 2. Fungsi Hybrid Ambil Data Informasi & Petugas dari Google Sheet (Online dengan Fallback Aman)
+function sinkronisasiDataMadingSheet() {
+    // Ganti URL ini dengan URL Apps Script Web App Google Sheet Anda
+    const URL_APPS_SCRIPT = "CONTOH_URL_WEB_APP_APPS_SCRIPT_ANDA"; 
 
-function muatDataDariGoogleSheet() {
-    fetch(URL_GOOGLE_SHEET)
+    console.log("[HYBRID] Mencoba menyinkronkan data informasi dari Google Sheet...");
+
+    fetch(URL_APPS_SCRIPT)
         .then(response => response.json())
         .then(res => {
-            
-            // 1. Injeksi Data Petugas & Informasi Kas Keuangan (Sheet 1)
-            if(document.getElementById('tanggalJumat')) document.getElementById('tanggalJumat').innerText = res.tanggalJumat || '-';
-            if(document.getElementById('khatib')) document.getElementById('khatib').innerText = res.khatib || '-';
-            if(document.getElementById('imam')) document.getElementById('imam').innerText = res.imam || '-';
-            if(document.getElementById('muadzin')) document.getElementById('muadzin').innerText = res.muadzin || '-';
-            
-            if(document.getElementById('saldoAwal')) document.getElementById('saldoAwal').innerText = "Rp " + (res.saldoAwal || '0');
-            if(document.getElementById('pemasukan')) document.getElementById('pemasukan').innerText = "Rp " + (res.pemasukan || '0');
-            if(document.getElementById('pengeluaran')) document.getElementById('pengeluaran').innerText = "Rp " + (res.pengeluaran || '0');
-            if(document.getElementById('totalSaldo')) document.getElementById('totalSaldo').innerText = "Rp " + (res.totalSaldo || '0');
+            console.log("[HYBRID] Koneksi sukses. Memperbarui informasi mading dari Google Sheet.");
 
-            if(document.getElementById('runText1')) document.getElementById('runText1').innerText = res.runningText || '';
-            if(document.getElementById('runText2')) document.getElementById('runText2').innerText = res.runningText || '';
-
-            // Simpan data konfigurasi jeda iqamah jika dikirim oleh skrip sheet
-            if(res.jedaIqamah) {
-                dataMasjidGlobal.jedaIqamah = res.jedaIqamah;
+            // A. Perbarui data konfigurasi Jeda Iqamah secara dinamis jika ada di Sheet
+            if (res.jedaIqamah) {
+                dataMasjidGlobal.jedaIqamah = {
+                    "SUBUH": res.jedaIqamah.SUBUH || 10,
+                    "DZUHUR": res.jedaIqamah.DZUHUR || 10,
+                    "ASHAR": res.jedaIqamah.ASHAR || 10,
+                    "MAGHRIB": res.jedaIqamah.MAGHRIB || 10,
+                    "ISYA": res.jedaIqamah.ISYA || 10
+                };
             }
 
-            // 2. Lookup Waktu Sholat dari Array Sheet 2 Berdasarkan Tanggal Hari Ini
-            if (res.tabelSholat && res.tabelSholat.length > 0) {
-                const tanggalKey = dapatkanKeyTanggalFormat(new Date()); // Menghasilkan string, misal: "20 Juni"
-                const pencarianJadwal = res.tabelSholat.find(item => item.tanggal === tanggalKey);
-
-                if (pencarianJadwal) {
-                    // Update variable data pusat
-                    jadwalSholatHariIni = {
-                        imsak:  pencarianJadwal.imsak,
-                        fajr:   pencarianJadwal.subuh,
-                        dhuhr:  pencarianJadwal.zuhur,
-                        asr:    pencarianJadwal.asar,
-                        sunset: pencarianJadwal.magrib,
-                        isha:   pencarianJadwal.isya
-                    };
-
-                    // Tempel data jam langsung ke papan display utama bawah
-                    if(document.getElementById('time-imsak')) document.getElementById('time-imsak').innerText = pencarianJadwal.imsak;
-                    if(document.getElementById('time-subuh')) document.getElementById('time-subuh').innerText = pencarianJadwal.subuh;
-                    if(document.getElementById('time-dzuhur')) document.getElementById('time-dzuhur').innerText = pencarianJadwal.zuhur;
-                    if(document.getElementById('time-ashar')) document.getElementById('time-ashar').innerText = pencarianJadwal.asar;
-                    if(document.getElementById('time-maghrib')) document.getElementById('time-maghrib').innerText = pencarianJadwal.magrib;
-                    if(document.getElementById('time-isya')) document.getElementById('time-isya').innerText = pencarianJadwal.isya;
-                }
+            // B. Perbarui Petugas Sholat Jumat & Petugas Harian jika ada di UI
+            if (res.petugasJumat) {
+                if(document.getElementById('tanggalJumat')) document.getElementById('tanggalJumat').innerText = res.petugasJumat.tanggal || "-";
+                if(document.getElementById('khatib')) document.getElementById('khatib').innerText = res.petugasJumat.khatib || "-";
+                if(document.getElementById('imamJumat')) document.getElementById('imamJumat').innerText = res.petugasJumat.imam || "-";
+                if(document.getElementById('muadzinJumat')) document.getElementById('muadzinJumat').innerText = res.petugasJumat.muadzin || "-";
             }
 
-            // 3. Sistem Slide Transisi Teks Informasi Tengah
+            // C. Sistem Slide Transisi Teks Informasi Tengah / Running Text Marquee
             const container = document.getElementById('infoUpdateContent');
             if (container && res.infoUpdate && res.infoUpdate.length > 0) {
                 const infoList = res.infoUpdate;
@@ -241,13 +92,23 @@ function muatDataDariGoogleSheet() {
             }
         })
         .catch(error => {
-            console.error("Gagal melakukan sinkronisasi data Google Sheet:", error);
+            // JIKA INTERNET PUTUS ATAU GOOGLE SHEET ERROR:
+            // Sistem diam, tidak crash, dan tetap menggunakan nilai default/teks yang sudah ada di HTML.
+            console.error("[OFFLINE MODE] Gagal sinkronisasi Google Sheet (Offline/RTO). Menggunakan data default aman:", error);
         });
 }
 
-// Inisialisasi Pertama Kali Saat Aplikasi Dibuka di TV Monitor
+// 3. Inisialisasi Pertama Kali Saat Aplikasi Dibuka di TV Monitor
 window.addEventListener('load', () => {
-    muatDataDariGoogleSheet();
-    // Sinkronisasi ulang secara berkala ke cloud setiap 5 menit sekali
-    setInterval(muatDataDariGoogleSheet, 300000);
+    // Jalankan pemuatan jadwal sholat offline seketika
+    muatJadwalSholatLokal();
+    
+    // Jalankan sinkronisasi data pendukung dari internet
+    sinkronisasiDataMadingSheet();
+
+    // Perbarui jadwal offline setiap jam sekali untuk mengantisipasi pergantian hari (tengah malam)
+    setInterval(muatJadwalSholatLokal, 3600000);
+
+    // Coba hubungkan ulang ke cloud Google Sheet setiap 10 menit sekali untuk update mading
+    setInterval(sinkronisasiDataMadingSheet, 600000);
 });
