@@ -33,7 +33,7 @@ const lng = 116.1997;
 const timezone = 8; // WITA
 pt.adjust({ fajr: 20, isha: 18 });
 
-// Sistem Fitur Alarm Beep (3 Kali bunyian tiap durasi menyentuh 00:00)
+// Sistem Fitur Alarm Beep
 const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
 function playBeep() {
     let osc = audioCtx.createOscillator();
@@ -50,12 +50,12 @@ function triggerAlarm() {
 }
 
 /* ==========================================================================
-   BAGIAN 2: ENGINE REFRESH CLOCK & COUNTDOWN (SETIAP 1 DETIK) - TOTAL HIDE FIX
+   BAGIAN 2: ENGINE REFRESH CLOCK & COUNTDOWN (SETIAP 1 DETIK)
    ========================================================================== */
 setInterval(() => {
     const sekarang = new Date();
     
-    // 1. Update Jam Utama di Rapat Bawah
+    // 1. Update Jam Utama
     let jam = String(sekarang.getHours()).padStart(2, '0');
     let menit = String(sekarang.getMinutes()).padStart(2, '0');
     let detik = String(sekarang.getSeconds()).padStart(2, '0');
@@ -112,9 +112,8 @@ setInterval(() => {
     let sisaDetik = sholatActive.targetDetik - waktuSekarangDetik;
 
     const elLabel = document.getElementById('nextPrayerLabel');
-    const elWaktu = document.getElementById('nextPrayerTime') || document.querySelector('.next-prayer-time');
+    const elWaktu = document.getElementById('nextPrayerTime');
     const elCountdown = document.getElementById('nextPrayerCountdown');
-    const elJadwalContainer = document.querySelector('.prayer-times-container') || document.getElementById('jadwal-shalat');
 
     if (elWaktu) elWaktu.innerText = sholatActive.waktuStr;
 
@@ -122,11 +121,8 @@ setInterval(() => {
     if (sisaDetik <= 0 && !sholatActive.isBesok) {
         if (sisaDetik === 0) triggerAlarm(); 
 
-        // 1. Sembunyikan Tabel Waktu Sholat Utama
-        if (elJadwalContainer) elJadwalContainer.style.setProperty('display', 'none', 'important');
-
-        // 2. Sembunyikan teks target jam sholat (Cara Radikal Menggunakan !important)
-        if (elWaktu) elWaktu.style.setProperty('display', 'none', 'important');
+        // Tambahkan class penanda iqamah pada body untuk diatur oleh CSS
+        document.body.classList.add('iqamah-mode');
 
         if (elLabel) {
             elLabel.innerHTML = 'MENUNGGU IQAMAH';
@@ -144,9 +140,8 @@ setInterval(() => {
 
         if (sisaIqamah === 0) triggerAlarm(); 
     } else {
-        // Mode Normal Menuju Adzan - Kembalikan Semua Tampilan
-        if (elJadwalContainer) elJadwalContainer.style.setProperty('display', 'block');
-        if (elWaktu) elWaktu.style.setProperty('display', 'inline-block'); 
+        // Mode Normal Menuju Adzan
+        document.body.classList.remove('iqamah-mode');
 
         if (elLabel) {
             elLabel.innerHTML = `WAKTU SHOLAT <span id="nextPrayerName">${sholatActive.isBesok ? 'SUBUH (BESOK)' : sholatActive.nama}</span>`;
@@ -165,7 +160,7 @@ setInterval(() => {
 }, 1000);
 
 /* ==========================================================================
-   BAGIAN 3: INJEKSI DATA KAS, PETUGAS & RUNNING TEXT
+   BAGIAN 3: INTEGRASI OTOMATIS GOOGLE SHEETS
    ========================================================================== */
 const URL_GOOGLE_SHEET = "https://script.google.com/macros/s/AKfycbzbz9r75Jkg9Kd2geoNRWzXp2IAzJC47Mh7gZsPMDXF7MvGL_JM6StX7PocTC2yLE3WLg/exec";
 
