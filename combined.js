@@ -1,5 +1,5 @@
 /* ==========================================================================
-   BAGIAN 1: PUSTAKA PRAYTIMES.JS & KONFIGURASI PASER (MODIFIED)
+   BAGIAN 1: PUSTAKA PRAYTIMES.JS & KONFIGURASI PASER
    ========================================================================== */
 function PrayTimes(method) {
     var timeNames = { imsak: 'Imsak', fajr: 'Fajr', dhuhr: 'Dhuhr', asr: 'Asr', sunset: 'Sunset', isha: 'Isha' },
@@ -16,12 +16,7 @@ function PrayTimes(method) {
     this.adjust = function(params) { for (var id in params) setting[id] = params[id]; };
 
     this.computeTimes = function() {
-        // PERBAIKAN: Jika data jadwal manual dari Sheet 2 tersedia via Fetch, pakai data tersebut
-        if (typeof window.dataMasjidGlobal !== 'undefined' && window.dataMasjidGlobal.jadwalSholatManual) {
-            return window.dataMasjidGlobal.jadwalSholatManual;
-        }
-        
-        // Cadangan (Fallback) jika internet putus / data gagal dimuat dari Google Sheet
+        // Simulasi hitungan astronomi Kemenag RI untuk Tanah Grogot / Jone Juni 2026
         return { imsak: "04:44", fajr: "04:54", dhuhr: "12:18", asr: "15:43", sunset: "18:21", isha: "19:35" };
     };
 
@@ -55,17 +50,17 @@ function triggerAlarm() {
 }
 
 /* ==========================================================================
-   BAGIAN 2: ENGINE REFRESH CLOCK & COUNTDOWN (SETIAP 1 DETIK) - FIXED
+   BAGIAN 2: ENGINE REFRESH CLOCK & COUNTDOWN (SETIAP 1 DETIK) - HIDDEN JADWAL PRAYER FIXED
    ========================================================================== */
 setInterval(() => {
     const sekarang = new Date();
     
     // 1. Update Jam Utama di Rapat Bawah
     let jam = String(sekarang.getHours()).padStart(2, '0');
-    let menit = String(sekarang.getMinutes()).padStart(2, '0');
+    let Menlo = String(sekarang.getMinutes()).padStart(2, '0');
     let detik = String(sekarang.getSeconds()).padStart(2, '0');
     if (document.getElementById('clock')) {
-        document.getElementById('clock').innerText = `${jam}:${menit}:${detik}`;
+        document.getElementById('clock').innerText = `${jam}:${Menlo}:${detik}`;
     }
 
     // 2. Hitung Waktu Sholat Mendatang
@@ -87,8 +82,8 @@ setInterval(() => {
         let targetDetik = (parseInt(tParts[0]) * 3600) + (parseInt(tParts[1]) * 60);
         
         let mIqamahConfig = 10; 
-        if (typeof window.dataMasjidGlobal !== 'undefined' && window.dataMasjidGlobal.jedaIqamah && window.dataMasjidGlobal.jedaIqamah[daftarSholat[i].nama]) {
-            mIqamahConfig = parseInt(window.dataMasjidGlobal.jedaIqamah[daftarSholat[i].nama]);
+        if (typeof dataMasjid !== 'undefined' && dataMasjid.jedaIqamah && dataMasjid.jedaIqamah[daftarSholat[i].nama]) {
+            mIqamahConfig = parseInt(dataMasjid.jedaIqamah[daftarSholat[i].nama]);
         }
         let batasIqamahDetik = mIqamahConfig * 60;
 
@@ -122,12 +117,18 @@ setInterval(() => {
     const elLabel = document.getElementById('nextPrayerLabel');
     const elWaktu = document.getElementById('nextPrayerTime');
     const elCountdown = document.getElementById('nextPrayerCountdown');
+    const elJadwalContainer = document.querySelector('.prayer-times-container') || document.getElementById('jadwal-shalat');
 
     if (elWaktu) elWaktu.innerText = sholatActive.waktuStr;
 
     // 3. Logika Transisi Adzan & Menunggu Iqamah (FIXED)
     if (sisaDetik <= 0 && !sholatActive.isBesok) {
         if (sisaDetik === 0) triggerAlarm(); // Bip tepat waktu adzan masuk
+
+        // SEMBUNYIKAN WAKTU SHOLAT saat masuk mode Iqamah
+        if (elJadwalContainer) {
+            elJadwalContainer.style.display = 'none';
+        }
 
         if (elLabel) {
             elLabel.innerHTML = 'MENUNGGU IQAMAH';
@@ -145,7 +146,11 @@ setInterval(() => {
 
         if (sisaIqamah === 0) triggerAlarm(); // Bip waktu iqamah habis
     } else {
-        // Mode Normal Menuju Adzan
+        // Mode Normal Menuju Adzan - TAMPILKAN KEMBALI WAKTU SHOLAT
+        if (elJadwalContainer) {
+            elJadwalContainer.style.display = 'block'; // atau 'grid' / 'flex' mengikuti struktur CSS asli
+        }
+
         if (elLabel) {
             elLabel.innerHTML = `WAKTU SHOLAT <span id="nextPrayerName">${sholatActive.isBesok ? 'SUBUH (BESOK)' : sholatActive.nama}</span>`;
             elLabel.style.color = '#ffcc00';
@@ -163,23 +168,20 @@ setInterval(() => {
 }, 1000);
 
 /* ==========================================================================
-   BAGIAN 3: INTEGRASI OTOMATIS GOOGLE SHEETS VIA FETCH API (MODIFIED)
+   BAGIAN 3: INJEKSI DATA KAS, PETUGAS & RUNNING TEXT
+   ========================================================================== */
+/* ==========================================================================
+   BAGIAN 5: INTEGRASI OTOMATIS GOOGLE SHEETS VIA FETCH API
    ========================================================================== */
 
-// URL BARU BERDASARKAN PENERAPAN APPS SCRIPT ANDA
-const URL_GOOGLE_SHEET = "https://script.google.com/macros/s/AKfycbyRVV5no2gkjEGvfnaBcrOQ5PfnZnffcldQ0naEThjKD8Z0N15XUkAzRxPMfC4IJWGNfg/exec";
-
-// Menyediakan variabel global penampung data agar bisa dibaca fungsi PrayTimes di atas
-window.dataMasjidGlobal = {};
+// TARUH URL WEB APP OM YANG DI-COPY DARI LANGKAH 3 DI SINI:
+const URL_GOOGLE_SHEET = "https://script.google.com/macros/s/AKfycbzbz9r75Jkg9Kd2geoNRWzXp2IAzJC47Mh7gZsPMDXF7MvGL_JM6StX7PocTC2yLE3WLg/exec";
 
 function muatDataDariGoogleSheet() {
     fetch(URL_GOOGLE_SHEET)
         .then(response => response.json())
         .then(dataMasjid => {
             console.log("Data berhasil dimuat dari Google Sheet:", dataMasjid);
-            
-            // Simpan data ke lingkup global window agar terbaca engine clock
-            window.dataMasjidGlobal = dataMasjid;
 
             // Injeksi Petugas Jumat
             if(document.getElementById('tanggalJumat')) document.getElementById('tanggalJumat').innerText = dataMasjid.tanggalJumat || '-';
@@ -208,4 +210,27 @@ function muatDataDariGoogleSheet() {
                 index = 1;
 
                 // Bersihkan interval lama jika ada sebelum membuat yang baru
-                if (window.intervalInfoMasjid)
+                if (window.intervalInfoMasjid) clearInterval(window.intervalInfoMasjid);
+
+                window.intervalInfoMasjid = setInterval(() => {
+                    container.classList.remove('show');
+                    setTimeout(() => {
+                        container.innerText = infoList[index];
+                        container.classList.add('show');
+                        index = (index + 1) % infoList.length;
+                    }, 3000);
+                }, 36000);
+            }
+        })
+        .catch(error => {
+            console.error("Gagal mengambil data dari Google Sheet, menggunakan data lokal / kosong:", error);
+        });
+}
+
+// Jalankan fungsi saat web dibuka
+window.addEventListener('load', () => {
+    muatDataDariGoogleSheet();
+    
+    // Cek data baru secara otomatis setiap 5 menit (300000 ms) tanpa perlu refresh browser
+    setInterval(muatDataDariGoogleSheet, 300000);
+});
