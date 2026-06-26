@@ -1,5 +1,5 @@
 /* ==========================================================================
-   BAGIAN 1: SISTEM DATABASE JADWAL SHOLAT INTERNAL & ALARM
+   BAGIAN 1: SISTEM DATABASE JADWAL SHOLAT INTERNAL & ALARM (AUDIO MP3)
    ========================================================================== */
 function ambilJadwalHariIni(dateObj) {
     const tahun = dateObj.getFullYear();
@@ -13,19 +13,52 @@ function ambilJadwalHariIni(dateObj) {
     return { imsak: "04:44", fajr: "04:54", dhuhr: "12:18", asr: "15:43", magrib: "18:21", isya: "19:35" };
 }
 
-const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-function playBeep() {
-    let osc = audioCtx.createOscillator();
-    let gain = audioCtx.createGain();
-    osc.connect(gain); gain.connect(audioCtx.destination);
-    osc.type = 'sine'; osc.frequency.setValueAtTime(1000, audioCtx.currentTime);
-    gain.gain.setValueAtTime(1, audioCtx.currentTime);
-    osc.start(); osc.stop(audioCtx.currentTime + 1);
+// Variabel penanda (flag) agar audio hanya berbunyi tepat satu kali
+let isAlarmAdzanPlay = false;
+let isAlarmIqamahPlay = false;
+
+// Fungsi pemicu interaksi untuk memancing izin audio browser
+function pancingIzinAudioBrowser() {
+    console.log("Izin audio berhasil dipancing melalui interaksi pengguna.");
+    // Membuat audio dummy pendek agar browser membuka blokir audio secara permanen untuk sesi ini
+    const dummyAudio = new Audio('audio/BEEP PENDEK.mp3');
+    dummyAudio.volume = 0; // Tanpa suara
+    dummyAudio.play().catch(() => {});
 }
-function triggerAlarm() {
-    playBeep();
-    setTimeout(playBeep, 1500);
-    setTimeout(playBeep, 3000);
+
+// Fungsi untuk memutar file MP3 secara berurutan atau tunggal
+function putarAudioMp3(fileUtama, fileSambungan = null) {
+    // Membuka file utama
+    const audio = new Audio(`audio/${fileUtama}`);
+    
+    audio.play().then(() => {
+        console.log(`Berhasil memutar audio: ${fileUtama}`);
+        if (fileSambungan) {
+            audio.onended = () => {
+                const audioSambungan = new Audio(`audio/${fileSambungan}`);
+                audioSambungan.play().then(() => {
+                    console.log(`Berhasil memutar sambungan: ${fileSambungan}`);
+                }).catch(e => {
+                    console.error(`Gagal memutar audio sambungan (${fileSambungan}). Periksa apakah file ada di folder audio/. Error:`, e);
+                });
+            };
+        }
+    }).catch(e => {
+        console.error(`Gagal memutar audio utama (${fileUtama}). Ini biasanya karena browser memblokir Autoplay atau file tidak ditemukan di folder audio/. Error:`, e);
+    });
+}
+
+// Mengubah triggerAlarm agar menerima tipe event ('adzan' atau 'iqamah')
+function triggerAlarm(tipe) {
+    if (tipe === 'adzan') {
+        console.log("Memicu jalannya alarm 7 detik sebelum Adzan...");
+        // 7 detik sebelum adzan: BEEP PENDEK.mp3 disambung BEEP PANJANG.mp3
+        putarAudioMp3('BEEP PENDEK.mp3', 'BEEP PANJANG.mp3');
+    } else if (tipe === 'iqamah') {
+        console.log("Memicu jalannya alarm 7 detik sebelum Iqamah...");
+        // 7 detik sebelum iqamah: hanya BEEP PENDEK.mp3
+        putarAudioMp3('BEEP PENDEK.mp3');
+    }
 }
 
 /* ==========================================================================
@@ -48,7 +81,7 @@ function hitungHijriyahOtomatis(dateObj) {
         }
     }
 
-    let jd = Math.floor(kustomSore.getTime() / 86400000) + 2440588;
+    let jd = Math.floor(kustomSore.getTime() / 86400000) + 2440589;
     let l = jd - 1948440 + 10632;
     let n = Math.floor((l - 1) / 10631);
     l = l - 10631 * n + 354;
@@ -161,7 +194,9 @@ setInterval(() => {
     if (elWaktu) elWaktu.innerText = sholatActive.waktuStr;
 
     if (sisaDetik <= 0 && !sholatActive.isBesok) {
-        if (sisaDetik === 0) triggerAlarm(); 
+        // Reset flag alarm adzan untuk persiapan waktu sholat berikutnya
+        isAlarmAdzanPlay = false;
+
         if (elWaktu) elWaktu.style.setProperty('display', 'none', 'important');
         if (elLabel) {
             elLabel.innerHTML = 'MENUNGGU IQAMAH';
@@ -178,8 +213,15 @@ setInterval(() => {
             elCountdown.style.background = 'rgba(255, 0, 0, 0.2)';
         }
 
+        // BERBUNYI DI RENTANG DETIK 7 KE BAWAH (ANTI LEWAT)
+        if (sisaIqamah <= 7 && sisaIqamah > 0 && !isAlarmIqamahPlay) {
+            isAlarmIqamahPlay = true;
+            triggerAlarm('iqamah');
+        }
+
         if (sisaIqamah <= 0) {
-            triggerAlarm();
+            // Reset kembali flag iqamah setelah standby sholat aktif
+            isAlarmIqamahPlay = false;
             aktifkanModeStandbySholat(sholatActive.nama);
         }
     } else {
@@ -197,6 +239,12 @@ setInterval(() => {
             elCountdown.innerText = `-${jamSisa}:${menitSisa}:${detikSisa}`;
             elCountdown.style.borderColor = '#ff5252';
             elCountdown.style.background = 'rgba(255, 0, 0, 0.15)';
+        }
+
+        // BERBUNYI DI RENTANG DETIK 7 KE BAWAH (ANTI LEWAT)
+        if (sisaDetik <= 7 && sisaDetik > 0 && !sholatActive.isBesok && !isAlarmAdzanPlay) {
+            isAlarmAdzanPlay = true;
+            triggerAlarm('adzan');
         }
     }
 }, 1000);
@@ -314,7 +362,7 @@ function prosesDanTampilkanData(valueRanges) {
     let sTabelKas = null;
     let sTeksPengumumanKumpulan = [];
 
-    // 1. FORMAT KHUSUS: PENGUMUMAN SHOLAT JUMAT (FULL TIMES NEW ROMAN, WARNA PUTIH, UKURAN BESAR, RAPAT)
+    // 1. FORMAT KHUSUS: PENGUMUMAN SHOLAT JUMAT
     let tglJmt = (dataJumat[0] && dataJumat[0][1]) ? dataJumat[0][1] : '-';
     let khtJmt = (dataJumat[1] && dataJumat[1][1]) ? dataJumat[1][1] : '-';
     let immJmt = (dataJumat[2] && dataJumat[2][1]) ? dataJumat[2][1] : '-';
@@ -351,7 +399,7 @@ function prosesDanTampilkanData(valueRanges) {
         `
     };
 
-    // 2. ROMBAK TOTAL SLIDE SALDO: 3 BARIS INTERAKTIF (DURASI KHUSUS 10 DETIK)
+    // 2. SLIDE SALDO
     let pmsknStr = "Rp " + totalPemasukan.toLocaleString('id-ID');
     let pglrnStr = "Rp " + totalPengeluaran.toLocaleString('id-ID');
 
@@ -360,12 +408,10 @@ function prosesDanTampilkanData(valueRanges) {
         durasi: 10000,
         html: `
             <div class="padded-slide-inner" style="justify-content: space-between; padding: 2vh 2vw; height: 100%;">
-                
                 <div style="background: rgba(0,0,0,0.25); border: 0.18vh solid rgba(229,193,88,0.3); border-radius: 1vh; width: 100%; padding: 1.5vh; text-align: center;">
                     <span style="font-size: 2vh; color: #a2bcae; display: block; font-weight: 600;">Saldo Jumat Lalu</span>
                     <strong style="font-size: 3.5vh; color: #ffffff; font-weight: 700; margin-top: 0.5vh; display: block;">${saldoAwal}</strong>
                 </div>
-
                 <div style="display: flex; gap: 1.5vw; width: 100%;">
                     <div style="flex: 1; background: rgba(46, 204, 113, 0.1); border: 0.18vh solid rgba(46, 204, 113, 0.4); border-radius: 1vh; padding: 1.5vh; text-align: center;">
                         <span style="font-size: 2vh; color: #2ecc71; display: block; font-weight: 600;">Penerimaan</span>
@@ -376,12 +422,10 @@ function prosesDanTampilkanData(valueRanges) {
                         <strong style="font-size: 3.5vh; color: #ffffff; font-weight: 700; margin-top: 0.5vh; display: block;">${pglrnStr}</strong>
                     </div>
                 </div>
-
                 <div style="background: linear-gradient(180deg, rgba(11,48,28,0.95) 0%, rgba(5,25,14,0.98) 100%); border: 0.25vh solid #e5c158; border-radius: 1.2vh; width: 100%; padding: 2.2vh; text-align: center; box-shadow: 0 0 1.5vh rgba(229,193,88,0.15);">
                     <span style="font-size: 2.2vh; color: #e5c158; display: block; font-weight: 600; letter-spacing: 0.05vw;">SALDO SEKARANG</span>
                     <strong style="font-size: 5.5vh; color: #ffffff; font-weight: 800; margin-top: 0.5vh; display: block; letter-spacing: 0.05vw;">${saldoAkhir}</strong>
                 </div>
-
             </div>
         `
     };
@@ -444,7 +488,6 @@ function prosesDanTampilkanData(valueRanges) {
         }
     }
 
-    // SUSUNAN ALTERNATIF SELANG-SELING BERGANTIAN SECARA DINAMIS
     dataSlides = [];
 
     function selipkanGambarLokal() {
@@ -455,12 +498,10 @@ function prosesDanTampilkanData(valueRanges) {
         });
     }
 
-    // Masukkan urutan wajib 1, 2, 3 di bagian awal putaran
     if (sTeksJumat) dataSlides.push(sTeksJumat);
     if (sSaldoJumat) dataSlides.push(sSaldoJumat);
     if (sTabelKas) dataSlides.push(sTabelKas);
 
-    // Proses penyisipan teks biasa sisa bergantian dengan gambar secara selang-seling (Interleaving)
     if (sTeksPengumumanKumpulan.length > 0) {
         sTeksPengumumanKumpulan.forEach(slideTeks => {
             selipkanGambarLokal(); 
@@ -566,7 +607,11 @@ function aktifkanAutoScrollKonten(waktuTersisaMilidetik) {
     }
 }
 
+// Interaksi klik dua kali untuk Fullscreen + Paksa buka izin suara browser
 document.addEventListener('dblclick', () => {
+    // Memancing izin browser saat user berinteraksi
+    pancingIzinAudioBrowser();
+
     if (!document.fullscreenElement) {
         document.documentElement.requestFullscreen().catch(err => {
             console.error(`Gagal mengaktifkan Full Screen: ${err.message}`);
