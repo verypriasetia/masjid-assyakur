@@ -1,0 +1,1 @@
+Pada saat menunggu iqamat, berpindah ke papan informasi masjid, hitungan countdown dengan ukuran teks besar, lalu pada saat countdown mencapai 00:00 menampilkan gambar waktu_sholat.jpg.
