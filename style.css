@@ -355,3 +355,66 @@ body {
 
 .text-center { text-align: center; }
 .text-right { text-align: right; }
+
+
+/* ==========================================================================
+   PERBAIKAN KHUSUS UNTUK HP / LAYAR KECIL (LANDSCAPE MODE)
+   ========================================================================== */
+@media screen and (max-height: 600px) and (orientation: landscape) {
+    body {
+        padding: 0.5vh;
+    }
+
+    /* 1. Sesuaikan Header */
+    .main-header {
+        height: 16vh;
+        padding: 0.5vh 1vw;
+        margin-bottom: 0.5vh;
+    }
+    .logo-img { height: 12vh; }
+    .title-container h1 { font-size: 4vh; }
+    .title-container h2 { font-size: 2.5vh; }
+    .title-container p { display: none; } /* Sembunyikan alamat di HP agar hemat ruang */
+
+    /* 2. Sesuaikan Struktur Utama */
+    .main-content {
+        height: 70vh;
+        gap: 1vw;
+        margin-bottom: 0.5vh;
+    }
+
+    .left-column { flex: 6.5; }
+    .right-column { flex: 3.5; gap: 0.5vh; }
+
+    /* 3. Atur Font Papan Informasi */
+    .papan-header { font-size: 3vh; padding: 0.5vh 0; }
+    .info-text-content { font-size: 4vh !important; }
+    .padded-slide-inner { padding: 1.5vh 2vw; }
+
+    /* 4. Optimasi Card Sebelah Kanan agar tidak Menumpuk */
+    .card { padding: 0.8vh !important; }
+    .card h3 { font-size: 2.2vh !important; margin-bottom: 0.2vh; }
+    
+    /* Card Jam */
+    .card-clock .clock-display { font-size: 5vh !important; }
+    .card-clock .date-display { font-size: 2.2vh !important; margin-top: 0.1vh; }
+    .card-clock .hijri-display { font-size: 2.2vh !important; margin-top: 0.1vh; }
+
+    /* Card Countdown */
+    .card-countdown .time-main { font-size: 4.5vh !important; }
+    .card-countdown .time-sub { font-size: 2.5vh !important; padding: 0.1vh 1vw; margin-top: 0.3vh; }
+
+    /* Card Rekening */
+    .rekening-box { padding: 0.4vh !important; }
+    .rekening-box .bank-name { font-size: 2vh !important; }
+    .rekening-box .acc-number { font-size: 2.6vh !important; margin: 0.1vh 0; }
+    .rekening-box .acc-owner { font-size: 1.8vh !important; }
+
+    /* Tabel Keuangan Khusus HP */
+    .table-kas { font-size: 1.8vh; }
+    .table-kas th, .table-kas td { padding: 0.5vh 0.5vw; }
+
+    /* 5. Footer Running Text */
+    .main-footer { height: 8vh; }
+    .marquee-text { font-size: 3.5vh; }
+}
